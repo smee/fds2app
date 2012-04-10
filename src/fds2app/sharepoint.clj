@@ -1,9 +1,11 @@
 (ns fds2app.sharepoint
   (:use [org.clojars.smee
          [file :only (find-files)]
+         [map :only (flatten-keys deep-merge-with)]
          [util :only (ignore-exceptions)]]
-        [clojure.core.match :only (match)]
-        clojure.core.match.regex)
+        ;[clojure.core.match :only (match)]
+        ;clojure.core.match.regex
+        )
   #_(:require [net.cgrand.parsley :as p]))
 
 (def doc-type-descriptions
@@ -128,9 +130,14 @@
                                   (filter valid-name?)
                                   (pmap decode-file-name)))
 
-(defn find-matching-files [query]
+#_(defn find-matching-files [query]
   ;; eval is needed to make sure that query is really the value when calling the 'match' macro
   (keep  identity (pmap #(eval `(match [~%] [~query] ~%)) sharepoint-names)))
+
+(defn find-matching-files [query]
+  (->> sharepoint-names
+    (map (fn [m] (deep-merge-with #(if (and %2 (re-matches %1 %2)) %2 :mismatch-error) query m)))
+    (remove #(some #{:mismatch-error} (vals (flatten-keys %))))))
 
 (comment 
   

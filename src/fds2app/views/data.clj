@@ -1,5 +1,5 @@
 (ns fds2app.views.data
-  (require [fds2app.sharepoint :as sp]
+  (:require [fds2app.sharepoint :as sp]
            clojure.walk
            [hiccup.form :as form])
   (:use
@@ -18,7 +18,7 @@
 
 (defpage [:post "/sharepoint"] {:keys [query]}
   (if-let [q (parse-query query)]
-    (let [f (fn [[k v]]  [(keyword k) v])
+    (let [f (fn [[k v]]  [(keyword k) (if (string? v) (re-pattern v) v)])
           q (clojure.walk/postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) q)] 
       (println "query: " (pr-str q))
       (json (sp/find-matching-files q)))
