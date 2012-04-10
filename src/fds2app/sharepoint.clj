@@ -1,6 +1,10 @@
-(ns fds2app.core
+(ns fds2app.sharepoint
   (:use [org.clojars.smee
-         [file :only (find-files)]]))
+         [file :only (find-files)]
+         [util :only (ignore-exceptions)]]
+        [clojure.core.match :only (match)]
+        clojure.core.match.regex)
+  #_(:require [net.cgrand.parsley :as p]))
 
 (def doc-type-descriptions
   {"PMD" {:description "Projekt Management Dokument"
@@ -19,8 +23,8 @@
           "520" "Bilder zur Öffentlichkeitsarbeit"}
    "RFD"	{:description "Referenzdokument"
           "000" "Definitionen (Dokumentation)"
-          "005" "Definitionen (Abkürzungen, …)"
-          "010" "Definitionen (Fachtermini, …)"
+          "005" "Definitionen (Abkürzungen, ...)"
+          "010" "Definitionen (Fachtermini, ...)"
           "015" "Definitionen (Daten)"
           "020" "Definitionen (Rollen)"
           "025" "Definitionen (Systeme)"
@@ -88,7 +92,7 @@
   (find-files root-path))
 
 (defn valid-name? [file-name]
-  (boolean (re-matches #"EUMONIS__\w{3}.\d{3}.\w{3}__.*__V_\d\d\.\d\d\.\w\w(__R_\d{8}\.\d{4}\.\w{3})?\.\w+" file-name)))
+  (boolean (re-matches #"EUMONIS__\w{3}\.\d{3}\.\w{3}__.*__V_\d\d\.\d\d\.\w\w(__R_\d{8}\.\d{4}\.\w{3})?\.\w+" file-name)))
 
 (defn- decode-file-name 
   "Decode EUMONIS file name format. Returns a map with translated codes."
@@ -113,7 +117,40 @@
                           :reviewer person})
                :language language}
      :status (cond 
-               review :under-review
-               (not (re-matches #"..\.00" version)) :draft
-               :else :released)
+               review "under-review"
+               (and (not (re-matches #"..\.00" version))) "draft"
+               :else "released")
      }))
+
+(def ^:private sharepoint-files (read-sharepoint "x:/"))
+(def ^:private sharepoint-names (->> sharepoint-files
+                                  (map #(.getName %))
+                                  (filter valid-name?)
+                                  (pmap decode-file-name)))
+
+(defn find-matching-files [query]
+  ;; eval is needed to make sure that query is really the value when calling the 'match' macro
+  (keep  identity (pmap #(eval `(match [~%] [~query] ~%)) sharepoint-names)))
+
+(comment 
+  
+  (def f (read-sharepoint "x:/"))
+  (count 
+    (filter #(match [%] 
+                    [{:status :released 
+                      :version {:number "03.00"} 
+                      :mime "pdf"}] %)
+            (map #(ignore-exceptions (decode-file-name (.getName %))) f))
+    )
+  )
+#_(def eumonis-file-name-parser
+  (p/parser {:main :filename
+             ;:space :__?
+             :root-tag :root}
+            ;:__ "__"
+            :filename [:tag :file-type :name :version :review?]
+            :tag "EUMONIS"
+            :file-type #"\w{3}\.\d{3}\.\w{3}"
+            :name #".*"
+            :version #"V_\d\d\.\d\d\.\w\w"
+            :review  #"R_\d{8}\.\d{4}\..*"))
