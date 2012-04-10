@@ -136,7 +136,7 @@
 
 (defn find-matching-files [query]
   (->> sharepoint-names
-    (map (fn [m] (deep-merge-with #(if (and %2 (re-matches %1 %2)) %2 :mismatch-error) query m)))
+    (map (fn [m] (deep-merge-with #(if (and %2 (re-find %1 %2)) %2 :mismatch-error) query m)))
     (remove #(some #{:mismatch-error} (vals (flatten-keys %))))))
 
 (comment 
