@@ -18,14 +18,14 @@
 
 
 
-(defn tree-of [root-node]
-  (tree-seq (constantly true) children root-node))
+(defn tree-of [fds-node]
+  (tree-seq (constantly true) children fds-node))
 
-(defn find-by [pred root-node]
-  (->> root-node tree-of (filter pred)))
+(defn find-by [pred fds-node]
+  (->> fds-node tree-of (filter pred)))
 
-(defn find-by-id [key root-node]
-  (first (find-by #(= key (id %)) root-node)))
+(defn find-by-id [key fds-node]
+  (first (find-by #(= key (id %)) fds-node)))
 
 
 

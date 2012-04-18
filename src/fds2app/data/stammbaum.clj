@@ -60,5 +60,4 @@
   (map :tag (xml1-> x children :Name text))
   
   (def park (stammbaum-fds "sample-data/komponenten-sea1.xml"))
-  (-> (fds/find-by-id "fan1" park)) ;; => #<Komponente {:id fan1, :type :Komponentenbeschreibung, :properties {:Name "Lüfter", :Einbaudatum #inst "2002-05-30T09:00:00.000-00:00", :Hersteller "Aldi"}}>
-  )
+  (-> (fds/find-by-id "fan1" park) fds/properties :Hersteller) ;; => "Aldi"  )
