@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Anlage>
+  <Park>Zugspitze</Park>
+  <Name>sea1</Name>
+  <Komponente id="kompA" name="Wechselrichter">
+    <Hersteller>OBI</Hersteller>
+    <Einbaudatum>2002-11-12T13:14:15</Einbaudatum>
+    <Komponente id="wr1" name="Teilsystem 1">
+        <Hersteller>OBI</Hersteller>
+        <Einbaudatum>2002-11-12T13:14:15</Einbaudatum>
+    </Komponente>   
+    <Komponente id="wr2" name="Teilsystem 2">
+        <Hersteller>OBI</Hersteller>
+        <Einbaudatum>2002-11-12T13:14:15</Einbaudatum>
+    </Komponente>
+    <Komponente id="wr3" name="Teilsystem 3">
+        <Hersteller>OBI</Hersteller>
+        <Einbaudatum>2002-11-12T13:14:15</Einbaudatum>
+        <Komponente id="temp" name="Temperatursensor">
+            <Hersteller>Aldi</Hersteller>
+            <Einbaudatum>2011-11-12T13:14:15</Einbaudatum>
+        </Komponente>
+        <Komponente id="fan1" name="Lüfter">
+            <Hersteller>Aldi</Hersteller>
+            <Einbaudatum>2002-05-30T09:00:00</Einbaudatum>
+        </Komponente>
+    </Komponente>
+  </Komponente>  
+</Anlage>

@@ -1,4 +1,4 @@
-(ns fds2app.sharepoint
+(ns fds2app.data.sharepoint
   (:use [org.clojars.smee
          [file :only (find-files)]
          [map :only (flatten-keys deep-merge-with)]
@@ -6,7 +6,8 @@
         ;[clojure.core.match :only (match)]
         ;clojure.core.match.regex
         )
-  #_(:require [net.cgrand.parsley :as p]))
+  ;(:require [net.cgrand.parsley :as p])
+  )
 
 (def doc-type-descriptions
   {"PMD" {:description "Projekt Management Dokument"
@@ -90,6 +91,7 @@
    "UL" "Universität Leipzig"
    "UV" "UV Sachsen Projektentwicklungs- und Verwaltungsgesellschaft mbH"})
 
+
 (defn- read-sharepoint [root-path]
   (find-files root-path))
 
@@ -130,9 +132,9 @@
                                   (filter valid-name?)
                                   (pmap decode-file-name)))
 
-#_(defn find-matching-files [query]
+;(defn find-matching-files [query]
   ;; eval is needed to make sure that query is really the value when calling the 'match' macro
-  (keep  identity (pmap #(eval `(match [~%] [~query] ~%)) sharepoint-names)))
+;  (keep  identity (pmap #(eval `(match [~%] [~query] ~%)) sharepoint-names)))
 
 (defn find-matching-files [query]
   (->> sharepoint-names
@@ -150,14 +152,14 @@
             (map #(ignore-exceptions (decode-file-name (.getName %))) f))
     )
   )
-#_(def eumonis-file-name-parser
-  (p/parser {:main :filename
-             ;:space :__?
-             :root-tag :root}
-            ;:__ "__"
-            :filename [:tag :file-type :name :version :review?]
-            :tag "EUMONIS"
-            :file-type #"\w{3}\.\d{3}\.\w{3}"
-            :name #".*"
-            :version #"V_\d\d\.\d\d\.\w\w"
-            :review  #"R_\d{8}\.\d{4}\..*"))
+;(def eumonis-file-name-parser
+;  (p/parser {:main :filename
+;             ;:space :__?
+;             :root-tag :root}
+;            ;:__ "__"
+;            :filename [:tag :file-type :name :version :review?]
+;            :tag "EUMONIS"
+;            :file-type #"\w{3}\.\d{3}\.\w{3}"
+;            :name #".*"
+;            :version #"V_\d\d\.\d\d\.\w\w"
+;            :review  #"R_\d{8}\.\d{4}\..*"))

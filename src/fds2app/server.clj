@@ -2,7 +2,7 @@
   (:require 
     [noir.server :as server]
     ;; view namespaces need to be required explicitely for tomcat
-    [fds2app.views data])
+    [fds2app.views web])
   (:gen-class))
 
 
