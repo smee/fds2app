@@ -13,35 +13,43 @@
   [s]
   (->> s pr-str (str "#inst ") read-string))
 
+(defn- id [loc]
+  (xml1-> loc (attr :id)))
+
+
 (deftype Komponente [loc]
   fds/fds-node
-  (children [_] (map #(Komponente. %) (xml-> loc children :Komponente)))
-  (type [_] :Komponentenbeschreibung)
-  (id [_] (xml1-> loc (attr :id)))
+  (children   [_] (map #(Komponente. %) (xml-> loc children :Komponente)))
+  (type       [_] :Komponentenbeschreibung)
+  (id         [_] (id loc))
   (properties [_] {:Name (xml1-> loc (attr :name))
                    :Einbaudatum (read-timestamp (xml1-> loc children :Einbaudatum text))
-                   :Hersteller (xml1-> loc children :Hersteller text)})
-  Object
-  (toString [this] (format "{:id %s, :type %s, :properties %s}" 
-                           (fds/id this)
-                           (fds/type this) 
-                           (pr-str (fds/properties this)))))
+                   :Hersteller (xml1-> loc children :Hersteller text)}))
 
 (deftype Anlage [loc]
   fds/fds-node
-  (children [this] (map #(Komponente. %) (xml-> loc children :Komponente)))
-  (type [this] :PV-Anlage)
-  (id [this] (xml1-> loc children :Name text))
-  (properties [_] {:park (xml1-> loc children :Park text)})
-  
-  Object
-  (toString [this] (format "{:id %s, :type %s, :properties %s}" 
-                           (fds/id this)
-                           (fds/type this)
-                           (pr-str (fds/properties this)))))
+  (children   [_] (map #(Komponente. %) (xml-> loc children :Komponente)))
+  (type       [_] :PV-Anlage)
+  (id         [_] (id loc))
+  (properties [this] {:Name (xml1-> loc children :Name text)
+                      :Komponenten (count (fds/children this))
+                      :Latitude (xml1-> loc children :Koordinaten :Latitude text)
+                      :Longitude (xml1-> loc children :Koordinaten :Longitude text)}))
+
+(deftype Park [loc]
+  fds/fds-node
+  (children   [_] (map #(Anlage. %) (xml-> loc children :Anlage)))
+  (type       [_] :PV-Park)
+  (id         [_] (id loc))
+  (properties [this] {:Park (xml1-> loc children :Name text)
+                      :Standort (xml1-> loc children :Ort text)
+                      :Anlagen (count (fds/children this))}))
 
 (defn stammbaum-fds [file]
-  (Anlage. (-> file io/input-stream xml/parse zip/xml-zip)))
+  (Park. (-> file io/input-stream xml/parse zip/xml-zip)))
+
+
+
 
 
 (comment 
@@ -51,6 +59,6 @@
   (parse-timestamp (xml1-> component-node :Einbaudatum text)) 
   (map :tag (xml1-> x children :Name text))
   
-  (def anlage (stammbaum-fds "sample-data/komponenten-sea1.xml"))
-  (-> (fds/find-by-id "fan1" anlage)) ;; => #<Komponente {:id fan1, :type :Komponentenbeschreibung, :properties {:Name "Lüfter", :Einbaudatum #inst "2002-05-30T09:00:00.000-00:00", :Hersteller "Aldi"}}>
+  (def park (stammbaum-fds "sample-data/komponenten-sea1.xml"))
+  (-> (fds/find-by-id "fan1" park)) ;; => #<Komponente {:id fan1, :type :Komponentenbeschreibung, :properties {:Name "Lüfter", :Einbaudatum #inst "2002-05-30T09:00:00.000-00:00", :Hersteller "Aldi"}}>
   )

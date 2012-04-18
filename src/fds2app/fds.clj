@@ -8,12 +8,14 @@
   (type [this])
   (id [this]))
 
+
 (deftype SimpleNode [id type properties children]
   fds-node
-  (children [_] children)
-  (type [_] type)
+  (children   [_] children)
+  (type       [_] type)
   (properties [_] properties)
-  (id [_] id))
+  (id         [_] id))
+
 
 
 (defn tree-of [root-node]
@@ -24,6 +26,8 @@
 
 (defn find-by-id [key root-node]
   (first (find-by #(= key (id %)) root-node)))
+
+
 
 (comment 
   
