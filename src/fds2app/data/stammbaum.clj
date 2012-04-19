@@ -60,4 +60,6 @@
   (map :tag (xml1-> x children :Name text))
   
   (def park (stammbaum-fds "sample-data/komponenten-sea1.xml"))
-  (-> (fds/find-by-id "fan1" park) fds/properties :Hersteller) ;; => "Aldi"  )
+  (-> (fds/find-by-id "fan1" park) fds/properties :Hersteller) ;; => "Aldi"  
+  )
+ 
