@@ -8,17 +8,19 @@
   [id date description type origin park-id power-station-id component-id predecessors]
   fds/Fds-Node
   (children   [_] (map map->Ereignis predecessors))
-  (properties [_] {:id id, :date date, :description description, :source origin, :references [park-id power-station-id component-id]})
+  (properties [this] {:id id, :date date, :description description, :source origin, :references [park-id power-station-id component-id]
+                      :depth (count (fds/children this))})
   (type       [_] (keyword type))
   (id         [_] id))
 
 (defrecord EreignisListe [events]
   fds/Fds-Node
   (children   [_] (map map->Ereignis events))
-  (properties [_] {:description "wartungsrelevante Ereignisse"})
+  (properties [_] {:description "wartungsrelevante Ereignisse", :events (count events)})
   (type       [_] :Ereignis-Liste)
   (id         [_] "dummy-event-id"))
 
+;;;;;;;;;;;; IO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- successors-of [id rows]
   (lazy-seq 
     (when-let [next (first (filter #(= id (:predecessor-id %)) rows))]
@@ -31,16 +33,10 @@
     (let [[header & rows] (doall (read-csv rdr :separator \;))
           rows (map (partial zipmap (map keyword header)) rows)
           singular (filter (comp empty? :predecessor-id) rows)]
-      (reverse
-        (sort-by #(get-in % [0 :id])
-                 (for [{id :id :as m} singular]
-                   (->> rows (successors-of id) (cons m) reverse)))))))
+      (->> (for [{id :id :as m} singular]
+             (->> rows (successors-of id) (cons m) reverse))
+        (sort-by #(get-in % [0 :id])) 
+        reverse 
+        (map (fn [[f & r]] (assoc f :predecessors r)))
+        ->EreignisListe))))
 
-
-(comment
-  (def csv (read-events "sample-data/events.csv"))
-  (def x (->EreignisListe (map (fn [[f & r]] (assoc f :predecessors r)) csv)))
-  (count (fds/tree-of x))
-  (keys (first csv))
-  (map #(get % "id") (first csv))
-  )

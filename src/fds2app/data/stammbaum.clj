@@ -55,12 +55,6 @@
 
 (comment 
   (def x (zip-xml "sample-data/komponenten-sea1.xml"))
-  (def component-node (xml1-> x descendants [(attr= :id "temp")] :Komponente))
-  (xml1-> component-node (attr :name))
   (parse-timestamp (xml1-> component-node :Einbaudatum text)) 
-  (map :tag (xml1-> x children :Name text))
-  
-  (def park (stammbaum-fds "sample-data/komponenten-sea1.xml"))
-  (-> (fds/find-by-id "fan1" park) fds/properties :Hersteller) ;; => "Aldi"  
   )
  

@@ -39,29 +39,3 @@ from any source."
 
 
 
-(comment 
-  (defrecord SimpleNode [id type properties children]
-    Fds-Node
-    (children   [_] children)
-    (type       [_] type)
-    (properties [_] properties)
-    (id         [_] id))
-  
-  (def example 
-    (SimpleNode. "a" "number" {:value 1}
-             [(SimpleNode. "a1" "number" {:value 2} nil) 
-              (SimpleNode. "a2" "number" {:value 3} 
-                           [(SimpleNode. "a21" "number" {:foo :bar, :value 100} [])])]))
-  
-  (find-by-id "a21" example) ;; => #fds2app.fds.SimpleNode{:id "a21", :value 100, :type "number", :children []}
-  (map id (find-by #(-> % properties :value even?) example));; => ("a1" "a21")
-  (map id (find-by #(contains? (properties %) :foo) example)) ;; => ("a21")
-  ;; inject nodes into example tree, also add to injected node dynamically
-  (def foo (enhanced-tree example 
-                          #(when (= "a" (id %)) 
-                             [(SimpleNode. "injected" "foobar" {:value 55, :misc "baz"} [])])
-                          #(when (= "foobar" (type %)) 
-                             [(SimpleNode. "injected-injected" "another type" {:some :properties} [])])))
-  (map (comp count children) (tree-of foo))
-  )
-
