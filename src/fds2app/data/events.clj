@@ -8,15 +8,20 @@
   [id date description type origin park-id power-station-id component-id predecessors]
   fds/Fds-Node
   (children   [_] (map map->Ereignis predecessors))
-  (properties [this] {:id id, :date date, :description description, :source origin, :references [park-id power-station-id component-id]
+  (properties [this] {:id id, 
+                      :date date, 
+                      :description description, 
+                      :source origin, 
+                      :references {:park-id park-id, :power-station-id power-station-id, :component-id component-id}
                       :depth (count (fds/children this))})
-  (type       [_] (keyword type))
+  (type       [_] (str "Ereignis " type))
   (id         [_] id))
 
 (defrecord EreignisListe [events]
   fds/Fds-Node
   (children   [_] (map map->Ereignis events))
-  (properties [_] {:description "wartungsrelevante Ereignisse", :events (count events)})
+  (properties [this] {:description "wartungsrelevante Ereignisse", 
+                      :events (count (fds/children this))})
   (type       [_] :Ereignis-Liste)
   (id         [_] "dummy-event-id"))
 

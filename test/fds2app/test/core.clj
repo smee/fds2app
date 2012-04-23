@@ -40,3 +40,16 @@
   (let [events-root (read-events "sample-data/events.csv")]
     (is (= 2 (count (children events-root))))
     (is (= 5 (count (tree-of events-root))))))
+
+(defn- component-finder [park]
+  (fn [node] 
+    (when-let [component (-> node properties :references :component-id (find-by-id park))] 
+      (vector component))))
+
+(deftest combine-events-and-stammbaum
+  (let [event-list (read-events "sample-data/events.csv")
+        park (stammbaum-fds "sample-data/komponenten-sea1.xml")
+        root-node (enhanced-tree event-list (component-finder park))]
+    (is (= 5 (-> event-list tree-of count)))
+    (is (= 8 (-> park tree-of count)))
+    (is (= 9 (-> root-node tree-of count)))))

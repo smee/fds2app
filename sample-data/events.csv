@@ -1,5 +1,5 @@
 id;predecessor-id;park-id;power-station-id;component-id;date;description;type;origin
-0;;Zugspitze;sea1;temp;2010-11-12T13:14:15.666;Sensor defekt;alert;auto
-1;0;Zugspitze;sea1;temp;2010-11-12T15:14:15.666;Ersatzteilbestellung ausgelöst;info;Max Mustermann
-2;1;Zugspitze;sea1;temp;2010-11-13T12:00:15.003;Sensor repariert;info;Max Mustermann
-3;;Zugspitze;sea2;fan1;2010-07-02T15:15:00.103;Lüfter steht;alert;auto
+0;;solar.zugspitze;sea1;temp;2010-11-12T13:14:15.666;Sensor defekt;alert;auto
+1;0;solar.zugspitze;sea1;temp;2010-11-12T15:14:15.666;Ersatzteilbestellung ausgelöst;info;Max Mustermann
+2;1;solar.zugspitze;sea1;temp;2010-11-13T12:00:15.003;Sensor repariert;info;Max Mustermann
+3;;solar.zugspitze;sea2;fan1;2010-07-02T15:15:00.103;Lüfter steht;alert;auto
