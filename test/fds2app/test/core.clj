@@ -6,9 +6,9 @@
     [fds2app.data.stammbaum :only (stammbaum-fds)]
     [fds2app.data.events :only (read-events ->EreignisListe)]))
 
-(defrecord SimpleNode [id type properties children]
+(defrecord SimpleNode [id type properties relations]
     Fds-Node
-    (children   [_] children)
+    (relations   [_] relations)
     (type       [_] type)
     (properties [_] properties)
     (id         [_] id))
@@ -29,8 +29,8 @@
                                      [(SimpleNode. "injected" "foobar" {:value 55, :misc "baz"} [])])
                                   #(when (= "foobar" (type %)) 
                                      [(SimpleNode. "injected-injected" "another type" {:some :properties} [])]))]
-      (is (= [2 0 1 0] (map (comp count children) (tree-of example))))
-      (is (= [3 0 1 0 1 0] (map (comp count children) (tree-of enhanced)))))))
+      (is (= [2 0 1 0] (map (comp count relations) (fds-seq example))))
+      (is (= [3 0 1 0 1 0] (map (comp count relations) (fds-seq enhanced)))))))
 
 (deftest stammbaum-test
   (let [park (stammbaum-fds "sample-data/komponenten-sea1.xml")]
@@ -38,8 +38,8 @@
   
 (deftest events-test
   (let [events-root (read-events "sample-data/events.csv")]
-    (is (= 2 (count (children events-root))))
-    (is (= 5 (count (tree-of events-root))))))
+    (is (= 2 (count (relations events-root))))
+    (is (= 5 (count (fds-seq events-root))))))
 
 (defn- component-finder [park]
   (fn [node] 
@@ -50,6 +50,6 @@
   (let [event-list (read-events "sample-data/events.csv")
         park (stammbaum-fds "sample-data/komponenten-sea1.xml")
         root-node (enhanced-tree event-list (component-finder park))]
-    (is (= 5 (-> event-list tree-of count)))
-    (is (= 8 (-> park tree-of count)))
-    (is (= 9 (-> root-node tree-of count)))))
+    (is (= 5 (-> event-list fds-seq count)))
+    (is (= 8 (-> park fds-seq count)))
+    (is (= 9 (-> root-node fds-seq count)))))

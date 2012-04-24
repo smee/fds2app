@@ -28,7 +28,7 @@
     (json {:id (f/id fds-node)
            :type (f/type fds-node)
            :properties (f/properties fds-node)
-           :children (map (juxt f/type #(to-str (url "/fds" {:id (f/id %)}))) (f/children fds-node))})
+           :relations (map (juxt f/type #(to-str (url "/fds" {:id (f/id %)}))) (f/relations fds-node))})
     {:status 400
      :body "Unknown id!"}))
 

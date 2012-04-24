@@ -4,24 +4,24 @@
   (:require [fds2app.fds :as fds]))
 
 (defrecord Ereignis 
-  #_"List of events, each one may have predecessor events as children"
+  #_"List of events, each one may have predecessor events as relations"
   [id date description type origin park-id power-station-id component-id predecessors]
   fds/Fds-Node
-  (children   [_] (map map->Ereignis predecessors))
+  (relations   [_] (map map->Ereignis predecessors))
   (properties [this] {:id id, 
                       :date date, 
                       :description description, 
                       :source origin, 
                       :references {:park-id park-id, :power-station-id power-station-id, :component-id component-id}
-                      :depth (count (fds/children this))})
+                      :depth (count (fds/relations this))})
   (type       [_] (str "Ereignis " type))
   (id         [_] id))
 
 (defrecord EreignisListe [events]
   fds/Fds-Node
-  (children   [_] (map map->Ereignis events))
+  (relations   [_] (map map->Ereignis events))
   (properties [this] {:description "wartungsrelevante Ereignisse", 
-                      :events (count (fds/children this))})
+                      :events (count (fds/relations this))})
   (type       [_] :Ereignis-Liste)
   (id         [_] "dummy-event-id"))
 

@@ -3,7 +3,7 @@
 
 (defprotocol Fds-Node
   "This protocol knows how to handle external datasources, locates data within and links it to other datasources."
-  (children [this] "Collection of fds-nodes.")
+  (relations [this] "Collection of related fds-nodes.")
   (properties [this])
   (type [this])
   (id [this]))
@@ -13,10 +13,10 @@
   (id [_] (id node))
   (properties [_] (properties node))
   (type [_] (type node))
-  (children [_]
+  (relations [_]
             (->> node-enhancers
               (map #(% node))
-              (apply concat (children node))
+              (apply concat (relations node))
               (map #(->Enhanced-Node % node-enhancers)))))
 
 (defn enhanced-tree 
@@ -30,7 +30,7 @@ from any source."
 (defn fds-seq 
   "Depth first sequence of a tree starting at the root node given."
   [fds-node]
-  (tree-seq (constantly true) children fds-node))
+  (tree-seq (constantly true) relations fds-node))
 
 (defn find-by [pred fds-node]
   (->> fds-node fds-seq (filter pred)))

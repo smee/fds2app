@@ -19,32 +19,32 @@
 
 (defrecord Komponente [loc]
   fds/Fds-Node
-  (children   [_] (map #(Komponente. %) (xml-> loc children :Komponente)))
+  (relations   [_] (map #(Komponente. %) (xml-> loc children :Komponente)))
   (type       [_] :Komponentenbeschreibung)
   (id         [_] (id loc))
   (properties [this] {:Name        (xml1-> loc (attr :name))
                       :Einbaudatum (read-timestamp (xml1-> loc children :Einbaudatum text))
                       :Hersteller  (xml1-> loc children :Hersteller text)
-                      :Komponenten (count (fds/children this))}))
+                      :Komponenten (count (fds/relations this))}))
 
 (defrecord Anlage [loc]
   fds/Fds-Node
-  (children   [_] (map #(Komponente. %) (xml-> loc children :Komponente)))
+  (relations   [_] (map #(Komponente. %) (xml-> loc children :Komponente)))
   (type       [_] :PV-Anlage)
   (id         [_] (id loc))
   (properties [this] {:Name        (xml1-> loc children :Name text)
-                      :Komponenten (count (fds/children this))
+                      :Komponenten (count (fds/relations this))
                       :Latitude    (xml1-> loc children :Koordinaten :Latitude text)
                       :Longitude   (xml1-> loc children :Koordinaten :Longitude text)}))
 
 (defrecord Park [loc]
   fds/Fds-Node
-  (children   [_] (map #(Anlage. %) (xml-> loc children :Anlage)))
+  (relations   [_] (map #(Anlage. %) (xml-> loc children :Anlage)))
   (type       [_] :PV-Park)
   (id         [_] (id loc))
   (properties [this] {:Park     (xml1-> loc children :Name text)
                       :Standort (xml1-> loc children :Ort text)
-                      :Anlagen  (count (fds/children this))}))
+                      :Anlagen  (count (fds/relations this))}))
 
 (defn stammbaum-fds [file]
   (Park. (-> file io/input-stream xml/parse zip/xml-zip)))
