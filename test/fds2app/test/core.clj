@@ -4,6 +4,7 @@
     [clojure.test]
     fds2app.fds 
     [fds2app.data.stammbaum :only (stammbaum-fds)]
+    [org.clojars.smee.seq :only (bf-tree-seq)]
     [fds2app.data.events :only (read-events ->EreignisListe)]))
 
 (defrecord SimpleNode [id type properties relations]
@@ -19,18 +20,17 @@
 (deftest simple-fds-node
   (is (= "a21" (:id (find-by-id "a21" example))))
   (is (= ["a1" "a21"] (map id (find-by #(-> % properties :value even?) example))))
-  (is (= ["a21"] (map id (find-by #(contains? (properties %) :foo) example))))
-  
-  
-  ;; inject nodes into example tree, also add to injected node dynamically
-  (deftest inject-nodes
-    (let [enhanced (enhanced-tree example 
-                                  #(when (= "a" (id %)) 
-                                     [(SimpleNode. "injected" "foobar" {:value 55, :misc "baz"} [])])
-                                  #(when (= "foobar" (type %)) 
-                                     [(SimpleNode. "injected-injected" "another type" {:some :properties} [])]))]
-      (is (= [2 0 1 0] (map (comp count relations) (fds-seq example))))
-      (is (= [3 0 1 0 1 0] (map (comp count relations) (fds-seq enhanced)))))))
+  (is (= ["a21"] (map id (find-by #(contains? (properties %) :foo) example)))))
+
+;; inject nodes into example tree, also add to injected node dynamically
+(deftest inject-nodes
+  (let [enhanced (enhanced-tree example 
+                                #(when (= "a" (id %)) 
+                                   [(SimpleNode. "injected" "foobar" {:value 55, :misc "baz"} [])])
+                                #(when (= "foobar" (type %)) 
+                                   [(SimpleNode. "injected-injected" "another type" {:some :properties} [])]))]
+    (is (= [2 0 1 0] (map (comp count relations) (fds-seq example))))
+    (is (= [3 0 1 0 1 0] (map (comp count relations) (fds-seq enhanced))))))
 
 (deftest stammbaum-test
   (let [park (stammbaum-fds "sample-data/komponenten-sea1.xml")]

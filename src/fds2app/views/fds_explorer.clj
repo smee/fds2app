@@ -7,7 +7,8 @@
     [hiccup 
      [core :only (html)]
      [element :only (link-to javascript-tag)]
-     [util :only (url to-str)]])
+     [util :only (url to-str url-encode)]]
+    [fds2app.dot :only (create-dot)])
   (:require [fds2app.fds :as f]
             [fds2app.data 
              [events :as ev]
@@ -37,3 +38,9 @@
     (serialize (f/find-by-id id root))
     (serialize root)))
 
+
+(defpage "/fds/visualize" {:keys [id]}
+  (let [root (if id (f/find-by-id id root) root)
+        graph (create-dot root)]
+    (html
+      [:img {:src (str "https://chart.googleapis.com/chart?cht=gv&chl=" (url-encode graph))}])))

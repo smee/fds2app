@@ -38,5 +38,3 @@ from any source."
 (defn find-by-id [key fds-node]
   (first (find-by #(= key (id %)) fds-node)))
 
-(defn get-by-ids [node ids]
-  )

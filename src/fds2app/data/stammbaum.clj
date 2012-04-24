@@ -57,4 +57,3 @@
   (def x (zip-xml "sample-data/komponenten-sea1.xml"))
   (parse-timestamp (xml1-> component-node :Einbaudatum text)) 
   )
- 
