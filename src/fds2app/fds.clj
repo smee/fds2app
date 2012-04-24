@@ -27,11 +27,13 @@ from any source."
 
 
 ;;;;;;;;;; Demo API ;;;;;;;;;;;;;;;;;;;;;;
-(defn tree-of [fds-node]
+(defn fds-seq 
+  "Depth first sequence of a tree starting at the root node given."
+  [fds-node]
   (tree-seq (constantly true) children fds-node))
 
 (defn find-by [pred fds-node]
-  (->> fds-node tree-of (filter pred)))
+  (->> fds-node fds-seq (filter pred)))
 
 (defn find-by-id [key fds-node]
   (first (find-by #(= key (id %)) fds-node)))
