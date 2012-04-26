@@ -1,5 +1,6 @@
 (ns fds2app.fds
-  (:refer-clojure :exclude [type]))
+  (:refer-clojure :exclude [type])
+  (:use [org.clojars.smee.seq :only (bf-tree-seq df-tree-seq)]))
 
 (defprotocol Fds-Node
   "This protocol knows how to handle external datasources, locates data within and links it to other datasources."
@@ -29,8 +30,9 @@ from any source."
 ;;;;;;;;;; Demo API ;;;;;;;;;;;;;;;;;;;;;;
 (defn fds-seq 
   "Depth first sequence of a tree starting at the root node given."
-  [fds-node]
-  (tree-seq (constantly true) relations fds-node))
+  ([fds-node] (fds-seq fds-node nil))
+  ([fds-node max-depth]
+  (df-tree-seq (constantly true) relations fds-node max-depth)))
 
 (defn find-by [pred fds-node]
   (->> fds-node fds-seq (filter pred)))
@@ -38,3 +40,5 @@ from any source."
 (defn find-by-id [key fds-node]
   (first (find-by #(= key (id %)) fds-node)))
 
+;(defn find-by-path [fds-node & ids]
+;  (reduce (fn [node id] (when node (first (filter #(= id (id %)) (relations node))))) fds-node ids))
