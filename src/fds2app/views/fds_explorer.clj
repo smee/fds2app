@@ -14,6 +14,7 @@
             [fds2app.data 
              [events :as ev]
              [stammbaum :as st]
+             [documents :as d]
              generated]
             ))
 
@@ -25,7 +26,7 @@
 (def ^:private root 
   (let [event-list (ev/read-events "sample-data/events.csv")
         park (st/stammbaum-fds "sample-data/komponenten-sea1.xml")]
-    (f/enhanced-tree event-list (component-finder park))))
+    (f/enhanced-tree event-list (component-finder park) d/join-documents)))
 
 (defn- serialize [fds-node]
   (if fds-node
