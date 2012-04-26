@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="ccw.launching.clojure">
+<stringAttribute key="CCW_ATTR_FILES_LAUNCHED_AT_STARTUP" value="/fds2app/test/fds2app/test/core.clj"/>
+<booleanAttribute key="ccw.repl.startOnLaunch" value="true"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/fds2app"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="4"/>
+</listAttribute>
+<mapAttribute key="org.eclipse.debug.core.environmentVariables">
+<mapEntry key="PATH" value="d:\swi-prolog\bin\"/>
+<mapEntry key="SWI_HOME_DIR" value="d:\swi-prolog"/>
+</mapAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.JRE_CONTAINER" value="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.7.0_32bit"/>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="clojure.main"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="fds2app"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Djava.library.path=d:\swi-prolog\bin\"/>
+</launchConfiguration>

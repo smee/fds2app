@@ -4,7 +4,9 @@ FIXME: write description
 
 ## Usage
 
-FIXME: write
+To use the SWI-Prolog integration make sure to prepare your system:
+- Define an environment variable SWI_HOME_DIR with your local SWI-Prolog path as value
+- Add the bin/ path of SWI-Prolog to your PATH variable.
 
 ## License
 
