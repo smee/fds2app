@@ -19,9 +19,11 @@
 (def ^:private all-docs (map extract-metadata (find-files "sample-data/documents/")))
 
 (defn join-documents [node]
-  (let [docs (filter #(and (= (-> % fds/properties :power-station-id)
+  (let [docs (filter #(or (= (-> % fds/properties :power-station-id)
                               (-> node fds/properties :references :power-station-id))
                            (= (-> % fds/properties :component-id)
-                              (-> node fds/properties :references :component-id)))
+                              (-> node fds/properties :references :component-id))
+                           (= (-> % fds/properties :component-id)
+                              (fds/id node)))
                      all-docs)]
     docs))
