@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="ccw.launching.clojure">
-<stringAttribute key="CCW_ATTR_FILES_LAUNCHED_AT_STARTUP" value="/fds2app/test/fds2app/test/core.clj"/>
+<stringAttribute key="CCW_ATTR_FILES_LAUNCHED_AT_STARTUP" value=""/>
 <booleanAttribute key="ccw.repl.startOnLaunch" value="true"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
 <listEntry value="/fds2app"/>

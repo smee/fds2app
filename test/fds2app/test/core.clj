@@ -1,5 +1,6 @@
 (ns fds2app.test.core
   (:refer-clojure :exclude [type])
+  (:require [fds2app.data.generated :as gen])
   (:use
     [clojure.test]
     fds2app.fds 
@@ -45,7 +46,6 @@
   (fn [node] 
     (when-let [component (-> node properties :references :component-id (find-by-id park))] 
       (vector component))))
-
 (deftest combine-events-and-stammbaum
   (let [event-list (read-events "sample-data/events.csv")
         park (stammbaum-fds "sample-data/komponenten-sea1.xml")
@@ -53,3 +53,7 @@
     (is (= 5 (-> event-list fds-seq count)))
     (is (= 8 (-> park fds-seq count)))
     (is (= 9 (-> root-node fds-seq count)))))
+
+(deftest max-depth-traversal
+  (let [natural-numbers (fds-seq (fds2app.data.generated.NaturalNumber. 0) 50)]
+    (is (= 50 (count (take 100 natural-numbers))))))
