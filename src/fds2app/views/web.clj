@@ -1,7 +1,10 @@
 (ns fds2app.views.web
   (:require [fds2app.data.sharepoint :as sp]
-           clojure.walk
-           [hiccup.form :as form])
+            [fds2app.data.rds-pp :refer (query-rds)]
+            clojure.walk
+            [clojure.string :as string]
+            [hiccup.form :as f]
+            noir.request)
   (:use
     [cheshire.core :only (parse-string)]
     [noir 
@@ -27,10 +30,10 @@
 
 (defpage "/sharepoint" []
   (html 
-    (form/form-to 
+    (f/form-to 
       [:post "/sharepoint"]
-      (form/text-area {:cols 50 :rows 8} :query "{\"status\": \"released\", \n\"mime\": \"pdf\", \n\"version\": {\"number\": \"03.00\"}}")
-      (form/submit-button "Suchen..."))))
+      (f/text-area {:cols 50 :rows 8} :query "{\"status\": \"released\", \n\"mime\": \"pdf\", \n\"version\": {\"number\": \"03.00\"}}")
+      (f/submit-button "Suchen..."))))
 
 (defn absolute-url
   "Construct absolute url for current request."
@@ -40,3 +43,13 @@
 (defpage "/explore" []
   (absolute-url))
 
+(defpage "/rds-pp" {:keys [key]}
+  (if key 
+    (let [res (query-rds key)]
+      (-> res (string/replace "\n" "<br/>") (string/replace "\t" (apply str (repeat 4 "&nbsp;")))))
+    (html
+      [:h2 "Bedeutung von RDS-PP-Schlüsseln"]
+      (f/form-to [:GET "/rds-pp"]
+               (f/label "key" "Bitte geben Sie einen RDS-PP-Schlüssel ein: ") 
+               (f/text-field {:size "90"} "key" "#PV01.L1SB0A =G001 MDL10 BT012 -WD001 QQ321 &MBB100/D00141")
+               (f/submit-button "Übersetzen")))))
