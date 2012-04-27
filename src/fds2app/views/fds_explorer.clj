@@ -16,6 +16,7 @@
              [stammbaum :as st]
              [documents :as d]
              generated]
+            [fds2app.views.common :refer (layout-with-links)]
             ))
 
 (defn- component-finder [park]
@@ -37,7 +38,7 @@
     {:status 400
      :body "Unknown id!"}))
 
-(defpage fds-explore "/fds" {:keys [id]}
+(defpage fds-explore "/fds.json" {:keys [id]}
   (if id
     (serialize (f/find-by-id id root))
     (serialize root)))
@@ -50,3 +51,23 @@
         graph (create-dot root max-depth)]
     (html
       [:img {:src (str "https://chart.googleapis.com/chart?cht=gv&chl=" (url-encode graph))}])))
+
+
+(defpartial map->table [m]
+  [:table.table.table-striped.table-condensed {:width "60%"}
+   [:tr [:th "Schlüssel"] [:th "Wert"]] 
+   (for [[k v] m]
+     [:tr [:td k] [:td v]])])
+
+(defpage "/fds.html" {:keys [id]}
+  (let[node (if id (f/find-by-id id root) root)
+       relations (f/relations node)
+       links (map #(link-to (to-str (url "/fds.html" {:id (f/id %)})) "Link") relations)]
+    (layout-with-links
+      [0 [:a {:href "#"} "Home"] [:a {:href "#contact"} "Kontakt"]]
+      [:div.span2 "Federated data system"]
+      [:div.span10
+       [:h4 "Inhalt"]
+       (map->table (f/properties node))
+       [:h4 "Weiterführende Informationen"]
+       (map->table (zipmap (map f/type relations) links))])))
