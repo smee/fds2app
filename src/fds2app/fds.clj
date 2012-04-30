@@ -1,10 +1,13 @@
 (ns fds2app.fds
   (:refer-clojure :exclude [type])
-  (:use [org.clojars.smee.seq :only (bf-tree-seq df-tree-seq)]))
+  (:use [org.clojars.smee
+         [map :only (map-values)]
+         [seq :only (bf-tree-seq df-tree-seq)]])
+  (:import java.util.Map))
 
 (defprotocol Fds-Node
   "This protocol knows how to handle external datasources, locates data within and links it to other datasources."
-  (relations [this] "Collection of related fds-nodes.")
+  (relations [this] [this type] "Collection of relations (map of relationship types to collection of nodes)")
   (properties [this])
   (type [this])
   (id [this]))
@@ -17,28 +20,43 @@
   (relations [_]
             (->> node-enhancers
               (map #(% node))
-              (apply concat (relations node))
-              (map #(->Enhanced-Node % node-enhancers)))))
+              (cons (relations node))
+              (apply merge-with concat) 
+              (map-values (fn [nodes] (map #(->Enhanced-Node % node-enhancers) nodes)))))
+  (relations [_ t]
+             (->> node-enhancers
+               (map #(% node t))               
+               (cons (relations node t))
+               (apply merge-with concat)
+               (map-values (fn [nodes] (map #(->Enhanced-Node % node-enhancers) nodes))))))
 
 (defn enhanced-tree 
-  "Any function in node-enhancers may inspect an instance of Fds-Node and return child nodes
+  "Any function in node-enhancers may inspect an instance of Fds-Node and return references to child nodes
 from any source."
   [fds-root-node & node-enhancers]
   (Enhanced-Node. fds-root-node node-enhancers))
 
 
 ;;;;;;;;;; Demo API ;;;;;;;;;;;;;;;;;;;;;;
+(defn relationship-types [fds-node]
+  (keys (relations fds-node)))
+
+(defn nodes [relations]
+  (apply concat (vals relations)))
+
 (defn fds-seq 
   "Depth first sequence of a tree starting at the root node given."
   ([fds-node] (fds-seq fds-node nil))
   ([fds-node max-depth]
-  (df-tree-seq (constantly true) relations fds-node max-depth)))
+  (df-tree-seq (constantly true) #(nodes (relations %)) fds-node max-depth)))
 
-(defn find-by [pred fds-node]
+(defn find-by 
+  "Find any node within the tree sequence spanned starting at the given node that returns true for the given predicate."
+  [pred fds-node]
   (->> fds-node fds-seq (filter pred)))
 
-(defn find-by-id [key fds-node]
+(defn find-by-id 
+  "Find any node within the tree seq. spanned starting at the given node with id=key."
+  [key fds-node]
   (first (find-by #(= key (id %)) fds-node)))
 
-;(defn find-by-path [fds-node & ids]
-;  (reduce (fn [node id] (when node (first (filter #(= id (id %)) (relations node))))) fds-node ids))

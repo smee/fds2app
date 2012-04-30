@@ -24,7 +24,7 @@
 (defn- component-finder [park]
   (fn [node] 
     (when-let [component (-> node f/properties :references :component-id (f/find-by-id park))] 
-      (vector component))))
+      {:component [component]})))
 
 (def ^:private root 
   (let [event-list (ev/read-events "sample-data/events.csv")
@@ -62,7 +62,7 @@
 
 (defpage "/fds.html" {:keys [id]}
   (let[node (if id (f/find-by-id id root) root)
-       relations (f/relations node)
+       relations (f/nodes (f/relations node))
        links (map #(link-to (to-str (url "/fds.html" {:id (f/id %)})) "Link") relations)]
     (layout-with-links
       [0 [:a {:href "#"} "Home"] [:a {:href "#contact"} "Kontakt"]]

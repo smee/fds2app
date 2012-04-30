@@ -9,7 +9,8 @@
   (id [_] (join "-" [power-station-id component-id mime date type]))
   (type [_] type)
   (properties [this] (into {} this))
-  (relations [_] []))
+  (relations [_] {})
+  (relations  [this t] {}))
 
 (defn- extract-metadata [file]
   (let [[ps-id comp-id doc-type rest] (seq (.split (.getName file) "__"))
@@ -27,4 +28,4 @@
                            (= (-> % fds/properties :component-id)
                               (fds/id node)))
                      all-docs)]
-    docs))
+    {:document docs}))

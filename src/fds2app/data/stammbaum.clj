@@ -19,7 +19,8 @@
 
 (defrecord Komponente [loc]
   fds/Fds-Node
-  (relations   [_] (map #(Komponente. %) (xml-> loc children :Komponente)))
+  (relations  [_] {:component (map #(Komponente. %) (xml-> loc children :Komponente))})
+  (relations  [this t] (select-keys (fds/relations this) [t]))
   (type       [_] :Komponentenbeschreibung)
   (id         [_] (id loc))
   (properties [this] {:Name        (xml1-> loc (attr :name))
@@ -29,7 +30,8 @@
 
 (defrecord Anlage [loc]
   fds/Fds-Node
-  (relations   [_] (map #(Komponente. %) (xml-> loc children :Komponente)))
+  (relations  [_] {:component (map #(Komponente. %) (xml-> loc children :Komponente))})
+  (relations  [this t] (select-keys (fds/relations this) [t]))
   (type       [_] :PV-Anlage)
   (id         [_] (id loc))
   (properties [this] {:Name        (xml1-> loc children :Name text)
@@ -39,7 +41,8 @@
 
 (defrecord Park [loc]
   fds/Fds-Node
-  (relations   [_] (map #(Anlage. %) (xml-> loc children :Anlage)))
+  (relations  [_] {:plant (map #(Anlage. %) (xml-> loc children :Anlage))})
+  (relations  [this t] (select-keys (fds/relations this) [t]))
   (type       [_] :PV-Park)
   (id         [_] (id loc))
   (properties [this] {:Park     (xml1-> loc children :Name text)

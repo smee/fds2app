@@ -7,7 +7,8 @@
   #_"List of events, each one may have predecessor events as relations"
   [id date description type origin park-id power-station-id component-id predecessors]
   fds/Fds-Node
-  (relations   [_] (map map->Ereignis predecessors))
+  (relations   [_] {:pred (map map->Ereignis predecessors)})
+  (relations  [this t] (select-keys (fds/relations this) [t]))
   (properties [this] {:id id, 
                       :date date, 
                       :description description, 
@@ -19,7 +20,8 @@
 
 (defrecord EreignisListe [events]
   fds/Fds-Node
-  (relations   [_] (map map->Ereignis events))
+  (relations   [_] {:event (map map->Ereignis events)})
+  (relations  [this t] (select-keys (fds/relations this) [t]))
   (properties [this] {:description "wartungsrelevante Ereignisse", 
                       :events (count (fds/relations this))})
   (type       [_] :Ereignis-Liste)
