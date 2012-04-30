@@ -9,7 +9,9 @@
      [element :only (link-to javascript-tag)]
      [util :only (url to-str url-encode)]]
     [fds2app.dot :only (create-dot)]
-    [org.clojars.smee.util :only (s2i)])
+    [org.clojars.smee
+     [map :only (map-values)]
+     [util :only (s2i)]])
   (:require [fds2app.fds :as f]
             [fds2app.data 
              [events :as ev]
@@ -44,13 +46,12 @@
     (serialize root)))
 
 
-(defpage "/fds/visualize" {:keys [id max-depth]}
-  (let [max-depth (s2i max-depth 10)
-        root (if id (f/find-by-id id root) root)
-        ;root (fds2app.data.generated.NaturalNumber. 0)
-        graph (create-dot root max-depth)]
-    (html
-      [:img {:src (str "https://chart.googleapis.com/chart?cht=gv&chl=" (url-encode graph))}])))
+(defn- create-dot-chart-url [node max-depth & [width height]]
+  (let [graph (create-dot node max-depth)
+        link (str "https://chart.googleapis.com/chart?cht=gv&chl=" (url-encode graph))]
+    (if (and width height)
+      (str link "&chs=" width "x" height)
+      link)))
 
 
 (defpartial map->table [m]
@@ -65,9 +66,14 @@
        links (map #(link-to (to-str (url "/fds.html" {:id (f/id %)})) "Link") relations)]
     (layout-with-links
       [0 [:a {:href "#"} "Home"] [:a {:href "#contact"} "Kontakt"]]
-      [:div.span2 "Federated data system"]
+      [:div.span2 
+       [:h4 "Federated data system"]
+       "Anzeige virtuell integrierter Daten bezüglich einer Energieerzeugungsanlage"
+       [:img {:src (create-dot-chart-url root 10 200 300)}]]
       [:div.span10
-       [:h4 "Inhalt"]
-       (map->table (f/properties node))
+       [:h3 "Inhalt"]
+       (map->table (map-values str (f/properties node)))
        [:h4 "Weiterführende Informationen"]
-       (map->table (zipmap (map f/type relations) links))])))
+       (map->table (map vector (map f/type relations) links))
+       [:h4 "Visualisierung"]
+       [:img {:src (create-dot-chart-url node 1)}]])))

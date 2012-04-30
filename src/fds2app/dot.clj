@@ -8,6 +8,6 @@
 (defn create-dot [node max-depth]
   (let [edges (for [node (f/fds-seq node max-depth) 
                     :let [rel-ids (map id (f/relations node))]]
-                (format "%s->{%s};" (id node) (join "," rel-ids)))]
-    (str "digraph {" (apply str edges) "}")))
+                (apply str (map #(format "%s->%s" (id node) %) rel-ids)))]
+    (str "digraph {" (apply str (distinct edges)) "}")))
 
