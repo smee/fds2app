@@ -18,11 +18,11 @@
   (properties [_] (properties node))
   (type [_] (type node))
   (relations [_]
-            (->> node-enhancers
-              (map #(% node))
-              (cons (relations node))
-              (apply merge-with concat) 
-              (map-values (fn [nodes] (map #(->Enhanced-Node % node-enhancers) nodes)))))
+             (->> node-enhancers
+               (map #(% node))
+               (cons (relations node))
+               (apply merge-with concat) 
+               (map-values (fn [nodes] (map #(->Enhanced-Node % node-enhancers) nodes)))))
   (relations [_ t]
              (->> node-enhancers
                (map #(% node t))               
@@ -38,14 +38,20 @@ from any source."
 
 
 ;;;;;;;;;; Demo API ;;;;;;;;;;;;;;;;;;;;;;
-(defn relationship-types [fds-node]
+(defn relationship-types 
+  "Get all relationship types of all outgoing relationships of this node."
+  [fds-node]
   (keys (relations fds-node)))
 
-(defn nodes [relations]
+(defn nodes 
+  "Get all related Fds-Nodes of relations (result of (relations fds-node))."
+  [relations]
   (apply concat (vals relations)))
 
 (defn fds-seq 
-  "Depth first sequence of a tree starting at the root node given."
+  "Depth first sequence of a tree starting at the root node given.
+Optionally takes two parameters:
+- max-depth ... maximum traversal depth"
   ([fds-node] (fds-seq fds-node nil))
   ([fds-node max-depth]
   (df-tree-seq (constantly true) #(nodes (relations %)) fds-node max-depth)))

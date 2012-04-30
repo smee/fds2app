@@ -55,15 +55,22 @@
 
 
 (defpartial map->table [m]
-  [:table.table.table-striped.table-condensed {:width "60%"}
+  [:table.table.table-striped.table-condensed
    [:tr [:th "Schlüssel"] [:th "Wert"]] 
    (for [[k v] m]
      [:tr [:td k] [:td v]])])
 
+(defpartial seqs->table [headers seqs]
+  [:table.table.table-striped.table-condensed
+   [:tr (for [h headers] [:th h])] 
+   (for [vs seqs]
+     [:tr (for [v vs] 
+            [:td v])])])
+
 (defpage "/fds.html" {:keys [id]}
   (let[node (if id (f/find-by-id id root) root)
-       relations (f/nodes (f/relations node))
-       links (map #(link-to (to-str (url "/fds.html" {:id (f/id %)})) "Link") relations)]
+       links (for [[k vs] (f/relations node), v vs]
+               [k (f/type v) (link-to (to-str (url "/fds.html" {:id (f/id v)})) "Link")])]
     (layout-with-links
       [0 [:a {:href "#"} "Home"] [:a {:href "#contact"} "Kontakt"]]
       [:div.span2 
@@ -74,6 +81,6 @@
        [:h3 "Inhalt"]
        (map->table (map-values str (f/properties node)))
        [:h4 "Weiterführende Informationen"]
-       (map->table (map vector (map f/type relations) links))
+       (seqs->table ["Referenzart" "Knotenart" "Link"] links)
        [:h4 "Visualisierung"]
        [:img {:src (create-dot-chart-url node 1)}]])))
