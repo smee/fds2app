@@ -19,10 +19,14 @@
              [stammbaum :as st]
              [documents :as d]
              generated]
-            [fds2app.views.common :refer (layout-with-links)]
-            ))
+            [fds2app.views.common :refer (layout-with-links layout)]
+            )
+  (:import [java.security NoSuchAlgorithmException MessageDigest]
+           java.math.BigInteger))
 
-(defn- component-finder [park]
+(defn- component-finder 
+  "Connect data about components with events."
+  [park]
   (fn [node] 
     (when-let [component (-> node f/properties :references :component-id (f/find-by-id park))] 
       {:component [component]})))
@@ -31,6 +35,10 @@
   (let [event-list (ev/read-events "sample-data/events.csv")
         park (st/stammbaum-fds "sample-data/komponenten-sea1.xml")]
     (f/enhanced-tree event-list (component-finder park) d/join-documents)))
+
+;;;;;;;;;;;;;;;;;;;;;; REST ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def ^:private data-sources (ref {}))
 
 (defn- serialize 
   "Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids."
@@ -50,7 +58,52 @@
     (serialize (f/find-by-id id root))
     (serialize root)))
 
+(defn- md5
+  "Compute the hex MD5 sum of a byte array."
+  [#^bytes b]
+  (let [alg (doto (MessageDigest/getInstance "MD5")
+              (.reset)
+              (.update b))]
+    (try
+      (.toString (new BigInteger 1 (.digest alg)) 16)
+      (catch NoSuchAlgorithmException e
+        (throw (new RuntimeException e))))))
 
+(defpage [:get "/fds/data-sources"] []
+  (json @data-sources))
+
+(defpage [:delete "/fds/data-sources/:id"] {:keys [id]}
+  (dosync (alter data-sources dissoc id))
+  {:status 200})
+
+(defpage [:get "/fds/data-sources/:id"] {:keys [id]}
+  (@data-sources id))
+
+
+(defpage [:post "/fds/data-sources"] {:keys [callback-url]}
+  (if (not-empty callback-url) 
+    (let [id (md5 (.getBytes callback-url))]
+      (dosync (alter data-sources assoc id callback-url))
+      {:status 200
+       :body (str "/fds/data-sources/" id)})
+    {:status 400
+     :body "missing parameter 'callback-url'"}))
+
+(defpage "/fds" []
+  (let [docs [["/fds/data-sources" "GET" "-" "JSON mit IDs und URLs aller bekannten Datenquellen"]
+              ["/fds/data-sources" "POST" "callback-url" "Füge eine neue Datenquelle hinzu. Liefert die URL fuer die neue Datenquelle."]
+              ["/fds/data-sources/ID" "GET" "-" "Registrierte URL einer Datenquelle"]
+              ["/fds/data-sources/ID" "DELETE" "-" "Lösche URL einer Datenquelle"]]
+        ] 
+    (layout
+      [:div.span2]
+      [:div.span10 [:h3 "REST für Federated Data Service"]
+       [:table.table
+        [:tr [:th "URL"] [:th "HTTP-Methode"] [:th "Parameter"] [:th "Erklärung"]]
+        (for [doc docs]
+          [:tr (for [d doc] [:td d])])]])))
+
+;;;;;;;;;;;;;;;;;;;; html page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- create-dot-chart-url [node max-depth & [width height]]
   (let [graph (create-dot node max-depth)
         link (str "https://chart.googleapis.com/chart?cht=gv&chl=" (url-encode graph))]

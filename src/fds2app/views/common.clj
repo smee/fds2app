@@ -41,10 +41,11 @@
                      :width "150px"}])]])
 
 (defpartial breadcrumb [links]
-  [:ul.breadcrumb
-   [:li "Navigationsverlauf: "]
-   (for [link links]
-     [:li [:span.divider "→"] link])])
+  (when links
+    [:ul.breadcrumb
+     [:li "Navigationsverlauf: "]
+     (for [link links]
+       [:li [:span.divider "→"] link])]))
 
 (defn layout-with-links [topbar-links breadcrumb-links sidebar-contents & contents]
   (html5
@@ -60,6 +61,6 @@
 
 (defn layout [& contents]
   (apply layout-with-links [0 [:a {:href "#"} "Home"] [:a {:href "#contact"} "Kontakt"]]
-         [:a {:href "/fds.html"} "Home"] [:a {:href "/fds.html?id=5"} "Ein Event"]
+         nil
          nil 
          contents))
