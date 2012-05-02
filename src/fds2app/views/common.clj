@@ -40,17 +40,26 @@
                      :alt "gef&#246;rdert durch das Bundesministerium f&#252;r Bildung und Forschung"
                      :width "150px"}])]])
 
+(defpartial breadcrumb [links]
+  [:ul.breadcrumb
+   [:li "Navigationsverlauf: "]
+   (for [link links]
+     [:li [:span.divider "→"] link])])
 
-(defn layout-with-links [topbar-links sidebar-contents & contents]
+(defn layout-with-links [topbar-links breadcrumb-links sidebar-contents & contents]
   (html5
     (eumonis-header)
     [:body
      (eumonis-topbar topbar-links)
+     (breadcrumb breadcrumb-links) 
      [:div.container-fluid
-      [:div.row-fluid sidebar-contents
-       contents
-       ]
+      [:div.row-fluid 
+       sidebar-contents
+       contents]
       (eumonis-footer)]]))
 
 (defn layout [& contents]
-  (apply layout-with-links [0 [:a {:href "#"} "Home"] [:a {:href "#contact"} "Kontakt"]] nil contents))
+  (apply layout-with-links [0 [:a {:href "#"} "Home"] [:a {:href "#contact"} "Kontakt"]]
+         [:a {:href "/fds.html"} "Home"] [:a {:href "/fds.html?id=5"} "Ein Event"]
+         nil 
+         contents))

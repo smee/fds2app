@@ -3,7 +3,8 @@
     [noir 
      [core :only (defpage defpartial url-for)]
      [options :only (resolve-url)]
-     [response :only (redirect json)]]
+     [response :only (redirect json)]
+     [session :only (flash-get flash-put!)]]
     [hiccup 
      [core :only (html)]
      [element :only (link-to javascript-tag)]
@@ -67,16 +68,31 @@
      [:tr (for [v vs] 
             [:td v])])])
 
+(defn- breadcrumb-links 
+  "Add link to current page to session, create vector of links to the last 8 visited pages."
+  [crnt-node]
+  (let [crumbs (or (flash-get :breadcrumbs) [])
+        next-link (link-to (str "/fds.html?id=" (f/id crnt-node)) (f/type crnt-node))
+        next-crumbs (->> next-link (conj crumbs) (partition-by identity) (map first) (take-last 8) vec)]
+    (println next-crumbs)
+    (flash-put! :breadcrumbs next-crumbs)
+    next-crumbs))
+
 (defpage "/fds.html" {:keys [id]}
-  (let[node (if id (f/find-by-id id root) root)
+  (let[node (if (not-empty id) (f/find-by-id id root) root)
        links (for [[k vs] (f/relations node), v vs]
-               [k (f/type v) (link-to (to-str (url "/fds.html" {:id (f/id v)})) "Link")])]
+               [k (f/type v) (link-to (str "/fds.html?id=" (f/id v)) "Link")])]
     (layout-with-links
+      ;; top links
       [0 [:a {:href "#"} "Home"] [:a {:href "#contact"} "Kontakt"]]
+      ;; bread crumb trail
+      (breadcrumb-links node)
+      ;; left side bar
       [:div.span2 
        [:h4 "Federated data system"]
        "Anzeige virtuell integrierter Daten bezüglich einer Energieerzeugungsanlage"
        [:img {:src (create-dot-chart-url root 10 200 300)}]]
+      ;; main contents
       [:div.span10
        [:h3 "Inhalt"]
        (map->table (map-values str (f/properties node)))

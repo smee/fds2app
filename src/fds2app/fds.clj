@@ -36,6 +36,13 @@ from any source."
   [fds-root-node & node-enhancers]
   (Enhanced-Node. fds-root-node node-enhancers))
 
+;; implement protocol for nil: just do nothing/ return empty results
+#_(extend-type nil 
+  Fds-Node
+  (relations ([_] []) ([_ _] []))  
+  (properties [_] {})
+  (type [_] nil)
+  (id [_] nil))
 
 ;;;;;;;;;; Demo API ;;;;;;;;;;;;;;;;;;;;;;
 (defn relationship-types 
