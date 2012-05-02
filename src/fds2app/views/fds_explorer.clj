@@ -32,12 +32,16 @@
         park (st/stammbaum-fds "sample-data/komponenten-sea1.xml")]
     (f/enhanced-tree event-list (component-finder park) d/join-documents)))
 
-(defn- serialize [fds-node]
+(defn- serialize 
+  "Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids."
+  [fds-node]
   (if fds-node
     (json {:id (f/id fds-node)
            :type (f/type fds-node)
            :properties (f/properties fds-node)
-           :relations (map (juxt f/type #(to-str (url "/fds" {:id (f/id %)}))) (f/relations fds-node))})
+           :relations (map-values (fn [nodes] (reduce #(update-in % [(f/type %2)] conj (f/id %2)) {} nodes)) (f/relations fds-node))
+           
+           })
     {:status 400
      :body "Unknown id!"}))
 
