@@ -28,4 +28,6 @@
                            (= (-> % fds/properties :component-id)
                               (fds/id node)))
                      all-docs)]
-    {:document docs}))
+    (if (not-empty docs) 
+      {:document docs}
+      {})))
