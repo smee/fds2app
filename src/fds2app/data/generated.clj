@@ -1,5 +1,6 @@
 (ns fds2app.data.generated
-  (:require [fds2app.fds :as fds]))
+  (:require [fds2app.fds :as fds]
+            [org.clojars.smee.util :refer (s2i)]))
 
 (defrecord NaturalNumber [n]
   fds/Fds-Node
@@ -13,3 +14,10 @@
              (select-keys (fds/relations this) [t])))
 
 
+(defn new-number [n]
+  (NaturalNumber. n))
+
+(defn by-id [^String id]
+  (let [[_ n] (re-find #"natural-number-([-]?\d+)" id)]
+    (when n
+      (new-number (s2i n)))))

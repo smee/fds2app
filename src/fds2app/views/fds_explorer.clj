@@ -7,7 +7,7 @@
      [session :only (flash-get flash-put!)]]
     [hiccup 
      [core :only (html)]
-     [element :only (link-to javascript-tag)]
+     [element :only (link-to javascript-tag unordered-list)]
      [util :only (url to-str url-encode)]]
     [fds2app.dot :only (create-dot)]
     [org.clojars.smee
@@ -97,3 +97,12 @@
        (seqs->table ["Referenzart" "Knotenart" "Link"] links)
        [:h4 "Visualisierung"]
        [:img {:src (create-dot-chart-url node 1)}]])))
+
+(defpage "/" []
+  (layout
+    (unordered-list
+      [(link-to "/fds/doc" "Dokumentation REST für externe Datenquellen")
+       (link-to "/fds.json" "REST-Schnittstelle für föderierte Daten")
+       (link-to "/fds.html" "Weboberfläche für föderierte Daten")
+       (link-to "/sample-data" "Beispiel für eine REST Datenquelle")
+       (link-to "/sharepoint" "Weboberfläche für Suche auf EUMONIS-Sharepoint (greift auf Netzlaufwerk X:/ zu)")])))

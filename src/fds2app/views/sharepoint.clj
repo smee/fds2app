@@ -32,11 +32,3 @@
       (form/text-area {:cols 50 :rows 8} :query "{\"status\": \"released\", \n\"mime\": \"pdf\", \n\"version\": {\"number\": \"03.00\"}}")
       (form/submit-button "Suchen..."))))
 
-(defn absolute-url
-  "Construct absolute url for current request."
-  ([] (absolute-url (noir.request/ring-request)))
-  ([{:keys [scheme server-port uri server-name]}] (format "%s://%s:%d%s" (name scheme) server-name server-port uri)))
-
-(defpage "/explore" []
-  (absolute-url))
-

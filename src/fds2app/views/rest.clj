@@ -3,8 +3,7 @@
          [core :only (defpage defpartial)]
          [response :only (json)]]
         [fds2app.views 
-         [common :only (layout)]
-         [web :only (absolute-url)]]
+         [common :only (layout absolute-url)]]
         [org.clojars.smee.map :only (map-values)])
   (:require [fds2app.fds :as f])
   (:import [java.security NoSuchAlgorithmException MessageDigest]
@@ -36,6 +35,7 @@
       (catch NoSuchAlgorithmException e
         (throw (new RuntimeException e))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;; Data source management ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (def ^:private data-sources (ref {}))
 
@@ -58,14 +58,14 @@
     {:status 400
      :body "missing parameter 'callback-url'"}))
 
-
+;;;;;;;;;;;;;;;;;;;;;;;;;;; Documentation page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defpartial rest-documentation [docs]
   [:table.table
    [:tr [:th "URL"] [:th "HTTP-Methode"] [:th "Parameter"] [:th "Erläuterung"]]
    (for [doc docs]
      [:tr (for [d doc] [:td d])])]) 
 
-(defpage "/fds" []
+(defpage "/fds/doc" []
   (let [registration-docs
         [[(str (absolute-url) "/fds/data-sources") "GET" "-" "JSON mit IDs und URLs aller bekannten Datenquellen"]
          [(str (absolute-url) "/fds/data-sources") "POST" "callback-url" "Füge eine neue Datenquelle hinzu. Liefert die URL fuer die neue Datenquelle."]
@@ -74,7 +74,7 @@
         data-source-docs
         [[".../nodes" "GET" "-" "Liste der Wurzelknoten dieser Datenquelle"]
          [".../nodes/:id" "GET" "-" "\":id\" wird durch eine ID eines Datenknotens ersetzt. Liefert den vollständigen Datenknoten zu dieser ID zurück."]
-         [".../relations" "GET" "???" "Liefere mit dem übergebenen Datenknoten verknüpfte Informationen aus dieser Datenquelle zurück."]]]
+         [".../relations" "POST" "node, relation-type (optional)" "Liefere mit dem übergebenen Datenknoten verknüpfte Informationen aus dieser Datenquelle zurück."]]]
     (layout
       [:div.span2]
       [:div.span10 

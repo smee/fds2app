@@ -64,3 +64,10 @@
          nil
          nil 
          contents))
+
+
+(defn absolute-url
+  "Construct absolute url for current request."
+  ([] (absolute-url (noir.request/ring-request)))
+  ([{:keys [scheme server-port uri server-name]}] (format "%s://%s:%d%s" (name scheme) server-name server-port uri)))
+
