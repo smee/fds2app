@@ -69,16 +69,13 @@
       ;; left side bar
       [:div.span2 
        [:h4 "Federated data system"]
-       "Anzeige virtuell integrierter Daten bezüglich einer Energieerzeugungsanlage"
-       [:img {:src (create-dot-chart-url root 10 200 300)}]]
+       "Anzeige virtuell integrierter Daten bezüglich einer Energieerzeugungsanlage"]
       ;; main contents
       [:div.span10
        [:h3 "Inhalt"]
        (map->table (map-values str (f/properties node)))
        [:h4 "Weiterführende Informationen"]
-       (seqs->table ["Referenzart" "Knotenart" "Link"] links)
-       [:h4 "Visualisierung"]
-       [:img {:src (create-dot-chart-url node 1)}]])))
+       (seqs->table ["Referenzart" "Knotenart" "Link"] links)])))
 
 (defpage "/" []
   (layout
