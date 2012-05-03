@@ -1,25 +1,29 @@
 (ns fds2app.views.rest
   (:use [noir
-         [core :only (defpage)]
+         [core :only (defpage defpartial)]
          [response :only (json)]]
-        [fds2app.views.common :only (layout)]
+        [fds2app.views 
+         [common :only (layout)]
+         [web :only (absolute-url)]]
         [org.clojars.smee.map :only (map-values)])
   (:require [fds2app.fds :as f])
   (:import [java.security NoSuchAlgorithmException MessageDigest]
            java.math.BigInteger))
 
+(defn- encode-node [fds-node]
+  {:id (f/id fds-node)
+   :type (f/type fds-node)
+   :properties (f/properties fds-node)
+   :relations (map-values (fn [nodes] (reduce #(update-in % [(f/type %2)] conj (f/id %2)) {} nodes)) (f/relations fds-node))})
+
 (defn node2json 
   "Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids."
   [fds-node]
-  (if fds-node
-    (json {:id (f/id fds-node)
-           :type (f/type fds-node)
-           :properties (f/properties fds-node)
-           :relations (map-values (fn [nodes] (reduce #(update-in % [(f/type %2)] conj (f/id %2)) {} nodes)) (f/relations fds-node))
-           
-           })
-    {:status 400
-     :body "Unknown id!"}))
+  (json (encode-node fds-node)))
+(defn nodes2json 
+  "Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids."
+  [& fds-nodes]
+  (json (map encode-node fds-nodes)))
 
 (defn- md5
   "Compute the hex MD5 sum of a byte array."
@@ -43,8 +47,7 @@
   {:status 200})
 
 (defpage [:get "/fds/data-sources/:id"] {:keys [id]}
-  (@data-sources id))
-
+  (json (@data-sources id)))
 
 (defpage [:post "/fds/data-sources"] {:keys [callback-url]}
   (if (not-empty callback-url) 
@@ -55,16 +58,29 @@
     {:status 400
      :body "missing parameter 'callback-url'"}))
 
+
+(defpartial rest-documentation [docs]
+  [:table.table
+   [:tr [:th "URL"] [:th "HTTP-Methode"] [:th "Parameter"] [:th "Erläuterung"]]
+   (for [doc docs]
+     [:tr (for [d doc] [:td d])])]) 
+
 (defpage "/fds" []
-  (let [docs [["/fds/data-sources" "GET" "-" "JSON mit IDs und URLs aller bekannten Datenquellen"]
-              ["/fds/data-sources" "POST" "callback-url" "Füge eine neue Datenquelle hinzu. Liefert die URL fuer die neue Datenquelle."]
-              ["/fds/data-sources/ID" "GET" "-" "Registrierte URL einer Datenquelle"]
-              ["/fds/data-sources/ID" "DELETE" "-" "Lösche URL einer Datenquelle"]]
-        ] 
+  (let [registration-docs
+        [[(str (absolute-url) "/fds/data-sources") "GET" "-" "JSON mit IDs und URLs aller bekannten Datenquellen"]
+         [(str (absolute-url) "/fds/data-sources") "POST" "callback-url" "Füge eine neue Datenquelle hinzu. Liefert die URL fuer die neue Datenquelle."]
+         [(str (absolute-url) "/fds/data-sources/ID") "GET" "-" "Registrierte URL einer Datenquelle"]
+         [(str (absolute-url) "/fds/data-sources/ID") "DELETE" "-" "Lösche URL einer Datenquelle"]]
+        data-source-docs
+        [[".../nodes" "GET" "-" "Liste der Wurzelknoten dieser Datenquelle"]
+         [".../nodes/:id" "GET" "-" "\":id\" wird durch eine ID eines Datenknotens ersetzt. Liefert den vollständigen Datenknoten zu dieser ID zurück."]
+         [".../relations" "GET" "???" "Liefere mit dem übergebenen Datenknoten verknüpfte Informationen aus dieser Datenquelle zurück."]]]
     (layout
       [:div.span2]
-      [:div.span10 [:h3 "REST für Federated Data Service"]
-       [:table.table
-        [:tr [:th "URL"] [:th "HTTP-Methode"] [:th "Parameter"] [:th "Erklärung"]]
-        (for [doc docs]
-          [:tr (for [d doc] [:td d])])]])))
+      [:div.span10 
+       [:h2 "REST für Federated Data Service"]
+       [:h3 "REST-Datenquellen"]
+       "Datenquellen müssen unter einer zu registrierenden Haupt-URL min. drei Sub-URLs bereitstellen:"
+       (rest-documentation data-source-docs)
+       [:h3 "Registrierung von Datenquellen"]
+       (rest-documentation registration-docs)])))
