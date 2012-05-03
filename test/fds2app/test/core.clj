@@ -32,7 +32,7 @@
                                 #(when (= "foobar" (type %)) 
                                    {:foo [(SimpleNode. "injected-injected" "another type" {:some :properties} [])]}))]
     (is (= [2 0 1 0] (map (comp count nodes relations) (fds-seq example))))
-    (is (= [3 0 1 0 1 0] (map (comp count nodes relations) (fds-seq enhanced))))))
+    (is (= [3 0 1 1 0 0] (map (comp count nodes relations) (fds-seq enhanced))))))
 
 (deftest stammbaum-test
   (let [park (stammbaum-fds "sample-data/komponenten-sea1.xml")]
@@ -59,4 +59,4 @@
 
 (deftest max-depth-traversal
   (let [natural-numbers (fds-seq (fds2app.data.generated.NaturalNumber. 0) 4)]
-    (is (= 15 (count (take 100 natural-numbers))))))
+    (is (= 31 (count (take 100 natural-numbers))) "breadth first traversal of depth 4, 2 numbers as relations per node should result in 1+2^1+2^2+2^3+2^4=31 nodes all in all")))
