@@ -5,7 +5,11 @@
         [fds2app.views 
          [common :only (layout absolute-url)]]
         [org.clojars.smee.map :only (map-values)])
-  (:require [fds2app.fds :as f])
+  (:require [fds2app.fds :as f]
+            [fds2app.data
+             [events :as ev]
+             [stammbaum :as st]
+             [documents :as d]])
   (:import [java.security NoSuchAlgorithmException MessageDigest]
            java.math.BigInteger))
 
@@ -19,6 +23,7 @@
   "Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids."
   [fds-node]
   (json (encode-node fds-node)))
+
 (defn nodes2json 
   "Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids."
   [& fds-nodes]
@@ -34,6 +39,19 @@
       (.toString (new BigInteger 1 (.digest alg)) 16)
       (catch NoSuchAlgorithmException e
         (throw (new RuntimeException e))))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;; internal root node ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn- component-finder 
+  "Connect data about components with events."
+  [park]
+  (fn [node] 
+    (when-let [component (-> node f/properties :references :component-id (f/find-by-id park))] 
+      {:component [component]})))
+
+(def ^:private internal-root-node 
+  (let [event-list (ev/read-events "sample-data/events.csv")
+        park (st/stammbaum-fds "sample-data/komponenten-sea1.xml")]
+    (f/enhanced-tree event-list (component-finder park) d/join-documents)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;; Data source management ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -57,6 +75,16 @@
        :body (str "/fds/data-sources/" id)})
     {:status 400
      :body "missing parameter 'callback-url'"}))
+
+;;;;;;;;;;;;;;;;;;;;;; Federated Data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defn root-node []
+  internal-root-node)
+
+(defpage "/fds.json" {:keys [id]}
+  (let [node (root-node)] 
+    (if id
+      (node2json (f/find-by-id id node))
+      (node2json node))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;; Documentation page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defpartial rest-documentation [docs]

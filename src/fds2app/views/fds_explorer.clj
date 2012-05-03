@@ -14,33 +14,9 @@
      [map :only (map-values)]
      [util :only (s2i)]])
   (:require [fds2app.fds :as f]
-            [fds2app.data 
-             [events :as ev]
-             [stammbaum :as st]
-             [documents :as d]
-             generated]
             [fds2app.views 
              [common :refer (layout-with-links layout)]
-             [rest :refer (node2json)]]))
-
-(defn- component-finder 
-  "Connect data about components with events."
-  [park]
-  (fn [node] 
-    (when-let [component (-> node f/properties :references :component-id (f/find-by-id park))] 
-      {:component [component]})))
-
-(def ^:private root 
-  (let [event-list (ev/read-events "sample-data/events.csv")
-        park (st/stammbaum-fds "sample-data/komponenten-sea1.xml")]
-    (f/enhanced-tree event-list (component-finder park) d/join-documents)))
-
-;;;;;;;;;;;;;;;;;;;;;; REST ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defpage "/fds.json" {:keys [id]}
-  (if id
-    (node2json (f/find-by-id id root))
-    (node2json root)))
+             [rest :refer (node2json root-node)]]))
 
 
 ;;;;;;;;;;;;;;;;;;;; html page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -71,12 +47,12 @@
   (let [crumbs (or (flash-get :breadcrumbs) [])
         next-link (link-to (str "/fds.html?id=" (f/id crnt-node)) (f/type crnt-node))
         next-crumbs (->> next-link (conj crumbs) (partition-by identity) (map first) (take-last 8) vec)]
-    (println next-crumbs)
     (flash-put! :breadcrumbs next-crumbs)
     next-crumbs))
 
 (defpage "/fds.html" {:keys [id]}
-  (let[node (if (not-empty id) (f/find-by-id id root) root)
+  (let[root (root-node)
+       node (if (not-empty id) (f/find-by-id id root) root)
        links (for [[k vs] (f/relations node), v vs]
                [k (f/type v) (link-to (str "/fds.html?id=" (f/id v)) "Link")])]
     (layout-with-links
