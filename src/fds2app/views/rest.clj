@@ -92,7 +92,8 @@
   (let [params {:node (json/generate-string (fds->map node))}
         params (if relation-type 
                  (assoc params :relation-type relation-type) 
-                 params)]    
+                 params)]
+    ;(.printStackTrace (RuntimeException.))
     (reduce-kv 
       (fn [relations source-id {:keys [url]}]
         (let [rel-url (str (u/url url "relations"))
@@ -107,9 +108,9 @@
               ;replace ids with ids that contain the id of the datasource
               ;so we know where to look later on
               ids-fixed (map-values #(map (partial fix-remote-id source-id) %) serialized-relations)
-              _ (prn ids-fixed)
-              _ (prn (map-values (partial map map->RemoteNode) ids-fixed))
-              _ (prn relations)
+              ;_ (prn ids-fixed)
+              ;_ (prn (map-values (partial map map->RemoteNode) ids-fixed))
+              ;_ (prn relations)
               ]
         (merge-with concat relations (map-values (partial map map->RemoteNode) ids-fixed))))
       {}
@@ -161,3 +162,7 @@
        "siehe " [:a {:href"/sample-data"} "diese Datenquelle"] " für natürliche Zahlen"
        [:h3 "Registrierung von Datenquellen"]
        (rest-documentation registration-docs)])))
+
+(comment
+  (dosync (alter data-sources assoc "local" (RemoteDataSource. "localintegers" "http://localhost:8080/sample-data")))
+  )
