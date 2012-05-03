@@ -14,7 +14,11 @@ This project contains:
 
 * Install [leiningen](https://github.com/technomancy/leiningen).
 * Run
-    `lein deps, run`
+    `lein deps, run` (default port is 8080)
+* Or: Build standalone application with 
+    * `lein deps, uberjar`
+    * copy `target/fds2app-VERSION-standalone.jar` into the same folder as `sample-data`
+    * run `PORT=12345 java -jar fds2app-VERSION-standalone.jar`
 * Then open a webbrowser and navigate to either [EUMONIS files](http://localhost:8080/sharepoint), [FDS root node](http://localhost:8080/fds) or the [visualization](http://localhost:8080/fds/visualize?max-depth=3).
 
 ## License

@@ -7,4 +7,5 @@
                  #_[net.cgrand/parsley "0.8.0"]
                  #_[org.clojure/core.match "0.2.0-alpha9"]
                  [noir "1.3.0-beta2"]]
-  :main fds2app.server)
+  :main fds2app.server
+  :ring {:handler fds2app.server/handler})
