@@ -3,7 +3,7 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [org.clojure/data.zip "0.1.0"]
                  [org.clojure/data.csv "0.1.2"]
-                 [org.clojars.smee/common "1.2.3"]
+                 [org.clojars.smee/common "1.2.4"]
                  [com.cemerick/url "0.0.5"]
                  [clj-http "0.4.0"]
                  #_[net.cgrand/parsley "0.8.0"]
