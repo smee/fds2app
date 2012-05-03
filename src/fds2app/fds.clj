@@ -48,12 +48,12 @@ from any source."
   (apply concat (vals relations)))
 
 (defn fds-seq 
-  "Depth first sequence of a tree starting at the root node given.
+  "Breadth first sequence of a tree starting at the root node given.
 Optionally takes two parameters:
 - max-depth ... maximum traversal depth"
   ([fds-node] (fds-seq fds-node nil))
   ([fds-node max-depth]
-  (df-tree-seq (constantly true) #(nodes (relations %)) fds-node max-depth)))
+  (bf-tree-seq (constantly true) #(nodes (relations %)) fds-node max-depth)))
 
 (defn find-by 
   "Find any node within the tree sequence spanned starting at the given node that returns true for the given predicate."
