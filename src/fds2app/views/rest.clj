@@ -79,6 +79,12 @@
       [:div.span2]
       [:div.span10 
        [:h2 "REST für Federated Data Service"]
+       "Informationen werden uniform mit Hilfe einer JSON-Serialisierung dargestellt. Struktur ist:"
+       [:table.table [:tr [:th "Schlüssel"] [:th "Wert"]]
+        [:tr [:td "id"] [:td "Eindeutiger interner Bezeichner dieses Informationsknotens"]]
+        [:tr [:td "type"] [:td "Typ des Informationsknotens"]]
+        [:tr [:td "properties"] [:td "Map mit beliebigen Informationen dieses Knotens"]]
+        [:tr [:td "relations"] [:td "Relationen zu anderen Knoten. Map von Relationstypen auf Maps von Knotentypen auf Listen von Knoten-IDs."]]]
        [:h3 "REST-Datenquellen"]
        "Datenquellen müssen unter einer zu registrierenden Haupt-URL min. drei Sub-URLs bereitstellen:"
        (rest-documentation data-source-docs)

@@ -102,7 +102,7 @@
   (layout
     (unordered-list
       [(link-to "/fds/doc" "Dokumentation REST für externe Datenquellen")
-       (link-to "/fds.json" "REST-Schnittstelle für föderierte Daten")
-       (link-to "/fds.html" "Weboberfläche für föderierte Daten")
+       (link-to "/fds.json" "REST-Schnittstelle für föderierte Daten. Optionaler Parameter \"id\" für den Zugriff auf einen bestimmten Knoten")
+       (link-to "/fds.html" "Weboberfläche für föderierte Daten. Optionaler Parameter \"id\" für den Zugriff auf einen bestimmten Knoten")
        (link-to "/sample-data" "Beispiel für eine REST Datenquelle")
        (link-to "/sharepoint" "Weboberfläche für Suche auf EUMONIS-Sharepoint (greift auf Netzlaufwerk X:/ zu)")])))
