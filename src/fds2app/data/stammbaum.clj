@@ -55,7 +55,12 @@
   (Park. (-> file io/input-stream xml/parse zip/xml-zip)))
 
 
-
+(defn component-finder 
+  "Connect data about components to events."
+  [park]
+  (fn [node] 
+    (when-let [component (-> node fds/properties :references :component-id (fds/find-by-id park))] 
+      {:component [component]})))
 
 
 (comment 

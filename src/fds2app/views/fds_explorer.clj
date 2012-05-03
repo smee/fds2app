@@ -18,7 +18,13 @@
              [common :refer (layout-with-links layout)]
              [rest :refer (node2json root-node)]]))
 
+;;;;;;;;;;;;;;;;;;;; federated data as json ;;;;;;;;;;;;;;;;;;;;;;;;
 
+(defpage "/fds.json" {:keys [id]}
+  (let [node (root-node)] 
+    (if id
+      (node2json (f/find-by-id id node))
+      (node2json node))))
 ;;;;;;;;;;;;;;;;;;;; html page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defn- create-dot-chart-url [node max-depth & [width height]]
   (let [graph (create-dot node max-depth)
@@ -45,7 +51,7 @@
   "Add link to current page to session, create vector of links to the last 8 visited pages."
   [crnt-node]
   (let [crumbs (or (flash-get :breadcrumbs) [])
-        next-link (link-to (str "/fds.html?id=" (f/id crnt-node)) (f/type crnt-node))
+        next-link (link-to (str "/fds.html?id=" (url-encode (f/id crnt-node))) (f/type crnt-node))
         next-crumbs (->> next-link (conj crumbs) (partition-by identity) (map first) (take-last 8) vec)]
     (flash-put! :breadcrumbs next-crumbs)
     next-crumbs))
@@ -54,7 +60,7 @@
   (let[root (root-node)
        node (if (not-empty id) (f/find-by-id id root) root)
        links (for [[k vs] (f/relations node), v vs]
-               [k (f/type v) (link-to (str "/fds.html?id=" (f/id v)) "Link")])]
+               [k (f/type v) (link-to (str "/fds.html?id=" (url-encode (f/id v))) "Link")])]
     (layout-with-links
       ;; top links
       [0 [:a {:href "#"} "Home"] [:a {:href "#contact"} "Kontakt"]]
