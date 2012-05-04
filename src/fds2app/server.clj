@@ -2,7 +2,7 @@
   (:require 
     [noir.server :as server]
     ;; view namespaces need to be required explicitely for tomcat
-    [fds2app.views sharepoint fds-explorer rest sample-datasource])
+    [fds2app.views fds-explorer rest sample-datasource])
   (:gen-class))
 
 

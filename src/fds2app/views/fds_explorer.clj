@@ -79,7 +79,4 @@
     [:h3 "Registrierung von weiteren Datenquellen per REST"]
     (unordered-list
       [(link-to "/fds/doc" "Dokumentation REST für externe Datenquellen")
-       (link-to "/sample-data" "Beispiel für eine REST Datenquelle")])
-    [:h3 "Sonstiges"]
-      (unordered-list
-        [(link-to "/sharepoint" "Weboberfläche für Suche auf EUMONIS-Sharepoint (greift auf Netzlaufwerk X:/ zu)")])))
+       (link-to "/sample-data" "Beispiel für eine REST Datenquelle")])))
