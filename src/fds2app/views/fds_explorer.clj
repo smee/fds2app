@@ -9,7 +9,6 @@
      [core :only (html)]
      [element :only (link-to javascript-tag unordered-list)]
      [util :only (url to-str url-encode)]]
-    [fds2app.dot :only (create-dot)]
     [org.clojars.smee
      [map :only (map-values)]
      [util :only (s2i)]])
@@ -26,13 +25,6 @@
       (node2json (f/find-by-id id node))
       (node2json node))))
 ;;;;;;;;;;;;;;;;;;;; html page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- create-dot-chart-url [node max-depth & [width height]]
-  (let [graph (create-dot node max-depth)
-        link (str "https://chart.googleapis.com/chart?cht=gv&chl=" (url-encode graph))]
-    (if (and width height)
-      (str link "&chs=" width "x" height)
-      link)))
-
 
 (defpartial map->table [m]
   [:table.table.table-striped.table-condensed
