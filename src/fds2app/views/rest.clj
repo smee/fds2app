@@ -17,7 +17,9 @@
   (:import [java.security NoSuchAlgorithmException MessageDigest]
            java.math.BigInteger))
 
-(defn fds->map [fds-node]
+(defn fds->map 
+  "Serialize an instance of fds2app.Fds-Node as a map."
+  [fds-node]
   {:id (f/id fds-node)
    :type (f/type fds-node)
    :properties (f/properties fds-node)
@@ -44,7 +46,7 @@
       (catch NoSuchAlgorithmException e
         (throw (new RuntimeException e))))))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;; REST data source management ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ## REST data source management - register remote REST data sources 
 (defrecord RemoteDataSource [name url])
 (defonce ^:private data-sources (ref {}))
 
@@ -67,7 +69,7 @@
     {:status 400
      :body "missing parameter 'callback-url' and 'name'"}))
 
-;;;;;;;;;;;;;;;;;;;;;; Federated Data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ## Federated Data 
 (def ^:private separator "<>")
 
 (defn- replace-related-nodes 
@@ -86,12 +88,15 @@ objects using f and returns the relations."
         fixed-rels (replace-related-nodes id-fix rels)]
     (assoc node-map :relations fixed-rels)))
 
-(defn- decode-remote-id [id]
+(defn- decode-remote-id 
+  "Split remote id into vector of [id, id of data source (key in @data-sources), real id]."
+  [id]
   (let [[source-id id] (.split id (str separator))]
     [id source-id (@data-sources source-id)]))
 
 (declare find-by-remote-id)
 
+;; RemoteNode is a Fds-Node that represents a remote information via REST. 
 (defrecord RemoteNode [id type properties relations]
   f/Fds-Node
   (id [_] id)
@@ -100,7 +105,9 @@ objects using f and returns the relations."
   (relations [_] (map-values (fn [m] (map find-by-remote-id (apply concat (vals m)))) relations))
   (relations [_ t] (map-values (fn [m] (map find-by-remote-id (apply concat (vals m)))) (select-keys relations [t]))))
 
-(defn- find-by-remote-id [remote-id]
+(defn- find-by-remote-id 
+  "Query remote REST datasource for a specific node by id."
+  [remote-id]
   ;(println "fetching remote node for id" id)
   (let [[id source-id {:keys [url]}] (decode-remote-id remote-id)
         node-url (str (u/url url "nodes" id))
@@ -116,7 +123,6 @@ objects using f and returns the relations."
         params (if relation-type 
                  (assoc params :relation-type relation-type) 
                  params)]
-    ;(.printStackTrace (RuntimeException.))
     (reduce-kv 
       (fn [relations source-id {:keys [url]}]
         (let [rel-url (str (u/url url "relations"))
@@ -131,15 +137,12 @@ objects using f and returns the relations."
               ;replace ids with ids that contain the id of the datasource
               ;so we know where to look later on
               ids-fixed (map-values #(map (partial encode-remote-ids source-id) %) serialized-relations)
-              ;_ (prn ids-fixed)
-              ;_ (prn (map-values (partial map map->RemoteNode) ids-fixed))
-              ;_ (prn relations)
               ]
         (merge-with concat relations (map-values (partial map map->RemoteNode) ids-fixed))))
       {}
       @data-sources)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;; internal root node ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; ## internal root node 
 
 (def ^:private internal-root-node 
   (let [event-list (ev/read-events "sample-data/events.csv")
@@ -151,7 +154,7 @@ objects using f and returns the relations."
   []
   internal-root-node)
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;; Documentation page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;; Documentation page 
 (defpartial rest-documentation [docs]
   [:table.table
    [:tr [:th "URL"] [:th "HTTP-Methode"] [:th "Parameter"] [:th "Erläuterung"]]
@@ -186,6 +189,7 @@ objects using f and returns the relations."
        [:h3 "Registrierung von Datenquellen"]
        (rest-documentation registration-docs)])))
 
+;; evaluate this line to add our local data REST data source
 (comment
   (dosync (alter data-sources assoc "local" (RemoteDataSource. "localintegers" "http://localhost:8080/sample-data")))
   )

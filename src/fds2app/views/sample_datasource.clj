@@ -1,4 +1,6 @@
-(ns fds2app.views.sample-datasource
+(ns ^{:doc "Sample REST data source. Provides Fds-Nodes that count the number of properties of other Fds-Nodes.
+Also they have two relations themselves: predecessor and successor."} 
+     fds2app.views.sample-datasource
   (:use [noir
          [core :only (defpage)]
          [response :only (json)]]

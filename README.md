@@ -10,6 +10,7 @@ This project contains:
 * a small webapplication that shows json representation of data nodes
 * a small webapplication that decodes EUMONIS file names (incl. query language)
 
+Please see the complete code documentation at *docs/uberdoc.html*.
 ## Usage
 
 * Install [leiningen](https://github.com/technomancy/leiningen).
@@ -19,7 +20,7 @@ This project contains:
     * `lein deps, uberjar`
     * copy `target/fds2app-VERSION-standalone.jar` into the same folder as `sample-data`
     * run `PORT=12345 java -jar fds2app-VERSION-standalone.jar`
-* Then open a webbrowser and navigate to either [EUMONIS files](http://localhost:8080/sharepoint), [FDS root node](http://localhost:8080/fds) or the [visualization](http://localhost:8080/fds/visualize?max-depth=3).
+* Then open a webbrowser and navigate to either [FDS root node](http://localhost:8080/fds.html) or the [documentation](http://localhost:8080/).
 
 ## License
 

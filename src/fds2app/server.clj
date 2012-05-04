@@ -14,7 +14,7 @@
                         })))
 
 
-;;;;;;;;;;;;;;; production settings ;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;; ## production settings
 
 
 (def handler (server/gen-handler {:mode :prod

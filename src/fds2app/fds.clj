@@ -1,9 +1,15 @@
+;; The main assumptions are:
+;;
+;; - There are several independent data sources
+;; - Data within these source is semantically connected
+;; - We want to access these logically linked informations using a uniform interface.
 (ns fds2app.fds
   (:refer-clojure :exclude [type])
   (:use [org.clojars.smee
          [map :only (map-values)]
          [seq :only (bf-tree-seq df-tree-seq distinct-by)]]))
 
+;; ## Main abstraction ##
 (defprotocol Fds-Node
   "This protocol knows how to handle external datasources, locates data within and links it to other datasources."
   (relations [this] [this type] "Collection of relations (map of relationship types to collection of nodes)")
@@ -11,6 +17,10 @@
   (type [this] "Type of this node.")
   (id [this] "Unique id of this node."))
 
+;; `Enhanced-Node` responds to the functions in  `Fds-Node` and wraps another `Fds-Node`. If asked for `relations`,
+;; it applies every function in `node-enhancers` to the node at hand. These functions return a map
+;; of relation types to `Fds-Node` instances. This allows dynamic attachment of different data sources
+;; to existing data.
 (defrecord Enhanced-Node [node node-enhancers]
   Fds-Node
   (id [_] (id node))
@@ -31,11 +41,12 @@
 
 (defn enhanced-tree 
   "Any function in node-enhancers may inspect an instance of Fds-Node and return references to child nodes
-from any source."
+from any source. Each element in `node-enhancers` has to be a function with two argument lists:
+ `[fds-node]` and `[fds-node type]`, see `relations` of the protocol `Fds-Node`."
   [fds-root-node & node-enhancers]
   (Enhanced-Node. fds-root-node node-enhancers))
 
-;;;;;;;;;; Demo API ;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;; ## Demo API ##
 (defn relationship-types 
   "Get all relationship types of all outgoing relationships of this node."
   [fds-node]
@@ -67,7 +78,7 @@ Takes one optional parameter:
   (->> fds-node distinct-fds-seq (filter pred)))
 
 (defn find-by-id 
-  "Find any node within the tree seq. spanned starting at the given node with id=key."
+  "Find any node within the tree sequence spanned starting at the given node where id = key."
   [key fds-node]
   (first (find-by #(= key (id %)) fds-node)))
 

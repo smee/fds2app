@@ -17,14 +17,14 @@
              [common :refer (layout-with-links layout)]
              [rest :refer (node2json root-node)]]))
 
-;;;;;;;;;;;;;;;;;;;; federated data as json ;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ## federated data as json
 
 (defpage "/fds.json" {:keys [id]}
   (let [node (root-node)] 
     (if id
       (node2json (f/find-by-id id node))
       (node2json node))))
-;;;;;;;;;;;;;;;;;;;; html page ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ## html page
 
 (defpartial map->table [m]
   [:table.table.table-striped.table-condensed
@@ -69,7 +69,7 @@
        [:h4 "Weiterführende Informationen"]
        (seqs->table ["Referenzart" "Knotenart" "Link"] links)])))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; main page - documentation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ## main page - documentation
 (defpage "/" []
   (layout
     [:h3 "Zugriff auf föderierte Daten"]

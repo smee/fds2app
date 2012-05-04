@@ -1,10 +1,13 @@
+;; Poor man's event/ticket system
+;; This is an example of a data source that contains informations about events.
+;; See _sample-data/events.csv_ for sample events.
 (ns fds2app.data.events
   (:use [clojure.java.io :only (reader)]
         [clojure.data.csv :only (read-csv)])
   (:require [fds2app.fds :as fds]))
 
+;;  List of events, each one may have predecessor events as relations
 (defrecord Ereignis 
-  #_"List of events, each one may have predecessor events as relations"
   [id date description type origin park-id power-station-id component-id predecessors]
   fds/Fds-Node
   (relations   [_] {:pred (map map->Ereignis predecessors)})
@@ -18,6 +21,7 @@
   (type       [_] (str "Ereignis " type))
   (id         [_] id))
 
+;; This is a list of events that implements the `Fds-Node` protocol.
 (defrecord EreignisListe [events]
   fds/Fds-Node
   (relations   [_] {:event (map map->Ereignis events)})
@@ -27,14 +31,16 @@
   (type       [_] :Ereignis-Liste)
   (id         [_] "dummy-event-id"))
 
-;;;;;;;;;;;; IO ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defn- successors-of [id rows]
+;;;;;;;;;;;; ## IO
+(defn- successors-of 
+  "Reconstruct all descendant rows of one id."
+  [id rows]
   (lazy-seq 
     (when-let [next (first (filter #(= id (:predecessor-id %)) rows))]
       (cons next (successors-of (:id next) (remove #(= next %) rows))))))
 
 (defn read-events 
-  "Read events from csv, group common events in reverse order defined by id->predecessor id links."
+  "Read events from a csv file, group common events defined by id->predecessor id links, sort in reverse date order."
   [file]
   (with-open [rdr (reader file)]
     (let [[header & rows] (doall (read-csv rdr :separator \;))

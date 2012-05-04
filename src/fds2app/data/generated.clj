@@ -1,7 +1,8 @@
+;; Example for a purely generative `Fds-Node` implementation.
 (ns fds2app.data.generated
   (:require [fds2app.fds :as fds]
             [org.clojars.smee.util :refer (s2i)]))
-
+;; `NaturalNumber` represents exactly that: A natural number. It has two `relations`: the successor and the predecessor.
 (defrecord NaturalNumber [n]
   fds/Fds-Node
   (id [_] (str "natural-number-" n))
@@ -14,7 +15,9 @@
              (select-keys (fds/relations this) [t])))
 
 
-(defn new-number [n]
+(defn new-number 
+  "Create an object that adheres to `Fds-Node` for an integer `n`."
+  [n]
   (NaturalNumber. n))
 
 (defn by-id [^String id]
