@@ -79,9 +79,14 @@
 
 (defpage "/" []
   (layout
+    [:h3 "Zugriff auf föderierte Daten"]
+    (unordered-list
+      [(link-to "/fds.json" "REST-Schnittstelle für föderierte Daten. Optionaler Parameter \"id\" für den Zugriff auf einen bestimmten Knoten")
+       (link-to "/fds.html" "Weboberfläche für föderierte Daten. Optionaler Parameter \"id\" für den Zugriff auf einen bestimmten Knoten")])
+    [:h3 "Registrierung von weiteren Datenquellen per REST"]
     (unordered-list
       [(link-to "/fds/doc" "Dokumentation REST für externe Datenquellen")
-       (link-to "/fds.json" "REST-Schnittstelle für föderierte Daten. Optionaler Parameter \"id\" für den Zugriff auf einen bestimmten Knoten")
-       (link-to "/fds.html" "Weboberfläche für föderierte Daten. Optionaler Parameter \"id\" für den Zugriff auf einen bestimmten Knoten")
-       (link-to "/sample-data" "Beispiel für eine REST Datenquelle")
-       (link-to "/sharepoint" "Weboberfläche für Suche auf EUMONIS-Sharepoint (greift auf Netzlaufwerk X:/ zu)")])))
+       (link-to "/sample-data" "Beispiel für eine REST Datenquelle")])
+    [:h3 "Sonstiges"]
+      (unordered-list
+        [(link-to "/sharepoint" "Weboberfläche für Suche auf EUMONIS-Sharepoint (greift auf Netzlaufwerk X:/ zu)")])))
