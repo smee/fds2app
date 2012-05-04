@@ -69,22 +69,45 @@
 
 ;;;;;;;;;;;;;;;;;;;;;; Federated Data ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (def ^:private separator "<>")
-(defn- fix-remote-id [prefix {:strs [id] :as node-map}]
-  (let [node-map (assoc node-map "id" (str prefix separator id))]
-    (map-values keyword identity node-map)))
 
-(defn- find-remote-source [id]
+(defn- replace-related-nodes 
+  "Take a nested map of relation type to maps of node types to sequences of objects (ids, Fds-Nodes, ...). Transforms those
+objects using f and returns the relations."
+  [f relations]
+  (map-values (fn [m] (map-values #(map f %) m)) relations))
+
+(defn- encode-remote-ids 
+  "Encode remote ids by prepending the name of the remote source, convert all json keys to keywords."
+  [prefix {:strs [id] :as json-node}]
+  (let [node-map (map-values keyword identity json-node)
+        id-fix (partial str prefix separator)
+        node-map (update-in node-map [:id] id-fix)
+        rels (:relations node-map)
+        fixed-rels (replace-related-nodes id-fix rels)]
+    (assoc node-map :relations fixed-rels)))
+
+(defn- decode-remote-id [id]
   (let [[source-id id] (.split id (str separator))]
-    (@data-sources source-id)))
+    [id source-id (@data-sources source-id)]))
 
-;(defn- )
+(declare find-by-remote-id)
+
 (defrecord RemoteNode [id type properties relations]
   f/Fds-Node
   (id [_] id)
   (type [_] type)
   (properties [_] properties)
-  (relations [_] {})
-  (relations [_ t] {}))
+  (relations [_] (map-values (fn [m] (map find-by-remote-id (apply concat (vals m)))) relations))
+  (relations [_ t] (map-values (fn [m] (map find-by-remote-id (apply concat (vals m)))) (select-keys relations [t]))))
+
+(defn- find-by-remote-id [remote-id]
+  ;(println "fetching remote node for id" id)
+  (let [[id source-id {:keys [url]}] (decode-remote-id remote-id)
+        node-url (str (u/url url "nodes" id))
+        response (client/get node-url)
+        json-node (json/parse-string (:body response))]
+    ;(println "got remote node" (pr-str json-node))
+    (map->RemoteNode (encode-remote-ids source-id json-node))))
 
 (defn- remote-find-relations
   "Create a function that queries a remote data source for relations to the given node."
@@ -107,7 +130,7 @@
               serialized-relations (json/parse-string (:body response))
               ;replace ids with ids that contain the id of the datasource
               ;so we know where to look later on
-              ids-fixed (map-values #(map (partial fix-remote-id source-id) %) serialized-relations)
+              ids-fixed (map-values #(map (partial encode-remote-ids source-id) %) serialized-relations)
               ;_ (prn ids-fixed)
               ;_ (prn (map-values (partial map map->RemoteNode) ids-fixed))
               ;_ (prn relations)
