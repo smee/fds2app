@@ -2,15 +2,14 @@
   (:refer-clojure :exclude [type])
   (:use [org.clojars.smee
          [map :only (map-values)]
-         [seq :only (bf-tree-seq df-tree-seq)]])
-  (:import java.util.Map))
+         [seq :only (bf-tree-seq df-tree-seq distinct-by)]]))
 
 (defprotocol Fds-Node
   "This protocol knows how to handle external datasources, locates data within and links it to other datasources."
   (relations [this] [this type] "Collection of relations (map of relationship types to collection of nodes)")
-  (properties [this])
-  (type [this])
-  (id [this]))
+  (properties [this] "Arbitrary map of properties. These are the contents of this information node")
+  (type [this] "Type of this node.")
+  (id [this] "Unique id of this node."))
 
 (defrecord Enhanced-Node [node node-enhancers]
   Fds-Node
@@ -48,17 +47,24 @@ from any source."
   (apply concat (vals relations)))
 
 (defn fds-seq 
-  "Breadth first sequence of a tree starting at the root node given.
-Optionally takes two parameters:
+  "Breadth first sequence of a tree starting at the root node given. 
+Takes one optional parameter:
 - max-depth ... maximum traversal depth"
   ([fds-node] (fds-seq fds-node 10))
   ([fds-node max-depth]
   (bf-tree-seq (constantly true) #(nodes (relations %)) fds-node max-depth)))
 
+(defn distinct-fds-seq
+  "Traverses the graph starting at fds-node in a breadth first fashion. Visits every node only once (skips duplicates, i.e. nodes with the same id).
+Takes one optional parameter:
+- max-depth ... maximum traversal depth"
+  ([fds-node] (distinct-fds-seq fds-node 10))
+  ([fds-node max-depth] (distinct-by id (fds-seq fds-node max-depth)))) 
+
 (defn find-by 
   "Find any node within the tree sequence spanned starting at the given node that returns true for the given predicate."
   [pred fds-node]
-  (->> fds-node fds-seq (filter pred)))
+  (->> fds-node distinct-fds-seq (filter pred)))
 
 (defn find-by-id 
   "Find any node within the tree seq. spanned starting at the given node with id=key."
