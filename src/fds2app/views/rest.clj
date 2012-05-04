@@ -163,10 +163,10 @@ objects using f and returns the relations."
 
 (defpage "/fds/doc" []
   (let [registration-docs
-        [[(str (absolute-url) "/fds/data-sources") "GET" "-" "JSON mit IDs und URLs aller bekannten Datenquellen"]
-         [(str (absolute-url) "/fds/data-sources") "POST" "callback-url, name" "Füge eine neue Datenquelle hinzu. Liefert die URL fuer die neue Datenquelle."]
-         [(str (absolute-url) "/fds/data-sources/ID") "GET" "-" "Registrierte URL einer Datenquelle"]
-         [(str (absolute-url) "/fds/data-sources/ID") "DELETE" "-" "Lösche URL einer Datenquelle"]]
+        [[(str (u/url (absolute-url) "/fds/data-sources")) "GET" "-" "JSON mit IDs und URLs aller bekannten Datenquellen"]
+         [(str (u/url (absolute-url) "/fds/data-sources")) "POST" "callback-url, name" "Füge eine neue Datenquelle hinzu. Liefert die URL fuer die neue Datenquelle."]
+         [(str (u/url (absolute-url) "/fds/data-sources/ID")) "GET" "-" "Registrierte URL einer Datenquelle"]
+         [(str (u/url (absolute-url) "/fds/data-sources/ID")) "DELETE" "-" "Lösche URL einer Datenquelle"]]
         data-source-docs
         [[".../nodes" "GET" "-" "Liste der Wurzelknoten dieser Datenquelle"]
          [".../nodes/:id" "GET" "-" "\":id\" wird durch eine ID eines Datenknotens ersetzt. Liefert den vollständigen Datenknoten zu dieser ID zurück."]
