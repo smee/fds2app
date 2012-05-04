@@ -63,7 +63,7 @@
                [k (f/type v) (link-to (str "/fds.html?id=" (url-encode (f/id v))) "Link")])]
     (layout-with-links
       ;; top links
-      [0 [:a {:href "#"} "Home"] [:a {:href "#contact"} "Kontakt"]]
+      [0 [:a {:href "/"} "Home"] [:a {:href "mailto:sdienst@informatik.uni-leipzig.de"} "Kontakt"]]
       ;; bread crumb trail
       (breadcrumb-links node)
       ;; left side bar
@@ -77,6 +77,7 @@
        [:h4 "Weiterführende Informationen"]
        (seqs->table ["Referenzart" "Knotenart" "Link"] links)])))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; main page - documentation ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defpage "/" []
   (layout
     [:h3 "Zugriff auf föderierte Daten"]

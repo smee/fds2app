@@ -20,7 +20,7 @@
   [:div.navbar
    [:div.navbar-inner
     [:div.container
-     [:a.brand {:href "http://rz.eumonis.org"} "EUMONIS-Lab"]
+     [:a.brand {:href "http://rz.eumonis.org"} "EUMONIS - Federated Data System"]
      [:ul.nav
       (map-indexed #(if (= % active-idx) 
                       [:li.active %2] 
