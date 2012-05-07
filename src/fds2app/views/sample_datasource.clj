@@ -6,7 +6,8 @@ Also they have two relations themselves: predecessor and successor."}
          [response :only (json)]]
         [fds2app.views 
          [common :only (layout)]
-         [rest :only (nodes2json node2json fds->map)]]
+         [rest :only (nodes2json node2json)]]
+        [fds2app.data.rest-proxy :only (fds->map)]
         [org.clojars.smee.util :only (s2i)])
   (:require [fds2app.fds :as f]
             [fds2app.data.generated :as gen]
