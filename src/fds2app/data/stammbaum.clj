@@ -1,3 +1,4 @@
+;; Datasource for component descriptions in XML.
 (ns fds2app.data.stammbaum
   (:refer-clojure :exclude [descendants ancestors])
   (:require clojure.walk
@@ -13,7 +14,9 @@
   [s]
   (->> s pr-str (str "#inst ") read-string))
 
-(defn- id [loc]
+(defn- id 
+  "Find value of the xml attribute \"id\"."
+  [loc]
   (xml1-> loc (attr :id)))
 
 
@@ -51,7 +54,9 @@
                       :Standort (xml1-> loc children :Ort text)
                       :Anlagen  (count (fds/relations this))}))
 
-(defn stammbaum-fds [file]
+(defn stammbaum-fds 
+  "Deserialize an XML file with component descriptions into instances of `fds2app.Fds-Node`."
+  [file]
   (Park. (-> file io/input-stream xml/parse zip/xml-zip)))
 
 
@@ -61,9 +66,3 @@
   (fn [node] 
     (when-let [component (-> node fds/properties :references :component-id (fds/find-by-id park))] 
       {:component [component]})))
-
-
-(comment 
-  (def x (zip-xml "sample-data/komponenten-sea1.xml"))
-  (parse-timestamp (xml1-> component-node :Einbaudatum text)) 
-  )

@@ -4,15 +4,10 @@ Also they have two relations themselves: predecessor and successor."}
   (:use [noir
          [core :only (defpage)]
          [response :only (json)]]
-        [fds2app.views 
-         [common :only (layout)]
-         [rest :only (nodes2json node2json)]]
-        [fds2app.data.rest-proxy :only (fds->map)]
-        [org.clojars.smee.util :only (s2i)])
-  (:require [fds2app.fds :as f]
-            [fds2app.data.generated :as gen]
-            [clojure.java.io :as io]
-            [cheshire.core :as json]))
+        [fds2app.serialize :only (fds->map)])
+  (:require 
+    [fds2app.data.generated :as gen]
+    [cheshire.core :as json]))
 
 (defpage "/sample-data" []
   "Return some integer numbers. When asked for relations, returns the count of the node's properties."
@@ -20,12 +15,12 @@ Also they have two relations themselves: predecessor and successor."}
 
 
 (defpage "/sample-data/nodes" []
-  (nodes2json (gen/new-number 99) (gen/new-number 0) (gen/new-number 5000)))
+  (json (map fds->map [(gen/new-number 99) (gen/new-number 0) (gen/new-number 5000)])))
 
 
 (defpage "/sample-data/nodes/:id" {:keys [id]}
   (if-let [node (gen/by-id id)] 
-    (node2json node)
+    (json (fds->map node))
     {:status 400
      :body "invalid id!"}))
 

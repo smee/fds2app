@@ -1,3 +1,5 @@
+;; This namespace handles remote data sources (reachable via http). For an example please refer
+;; to the sample data source implementation `fds2app.views.sample-datasource`.
 (ns fds2app.data.rest-proxy
   (:require
     [cemerick.url :as u]
@@ -5,20 +7,14 @@
     [fds2app.fds :as f]
     [clj-http.client :as client])
   (:use 
-    [org.clojars.smee 
-     [map :only (map-values)]]
-    ))
+    [org.clojars.smee.map :only (map-values)]
+    [fds2app.serialize :only (fds->map)]))
 
+;; Metadata about remote http data sources
 (defrecord RemoteDataSource [name url])
-(defonce data-sources (ref {}))
 
-(defn fds->map 
-  "Serialize an instance of fds2app.Fds-Node as a map."
-  [fds-node]
-  {:id (f/id fds-node)
-   :type (f/type fds-node)
-   :properties (f/properties fds-node)
-   :relations (map-values (fn [nodes] (reduce #(update-in % [(f/type %2)] conj (f/id %2)) {} nodes)) (f/relations fds-node))})
+;; `data-sources` consists of a map of identifiers to instances of `RemoteDataSource`.
+(defonce data-sources (ref {}))
 
 ;; ## Federated Data 
 (def ^:private separator "<>")
@@ -45,9 +41,12 @@ objects using f and returns the relations."
   (let [[source-id id] (.split id (str separator))]
     [id source-id (@data-sources source-id)]))
 
+;; Forward declaration of this function is necessary because it uses the type `RemoteNode` and vice versa.
 (declare find-by-remote-id)
 
 ;; RemoteNode is a Fds-Node that represents a remote information via REST. 
+;; It takes REST style maps as parameters. `relations` for example is assumed to contain ids that were generated using
+;; `encode-remote-ids`.
 (defrecord RemoteNode [id type properties relations]
   f/Fds-Node
   (id [_] id)
@@ -57,7 +56,8 @@ objects using f and returns the relations."
   (relations [_ t] (map-values (fn [m] (map find-by-remote-id (apply concat (vals m)))) (select-keys relations [t]))))
 
 (defn- find-by-remote-id 
-  "Query remote REST datasource for a specific node by id."
+  "Query remote REST datasource for a specific node by id. Splits the id into real remote id and name of the
+remote data source. Then it queries the remote source for the contents of the node."
   [remote-id]
   ;(println "fetching remote node for id" id)
   (let [[id source-id {:keys [url]}] (decode-remote-id remote-id)

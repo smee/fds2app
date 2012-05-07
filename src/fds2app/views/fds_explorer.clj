@@ -1,30 +1,27 @@
 (ns fds2app.views.fds-explorer
   (:use 
     [noir 
-     [core :only (defpage defpartial url-for)]
-     [options :only (resolve-url)]
-     [response :only (redirect json)]
+     [core :only (defpage defpartial)]
+     [response :only (json)]
      [session :only (flash-get flash-put!)]]
     [hiccup 
-     [core :only (html)]
-     [element :only (link-to javascript-tag unordered-list)]
-     [util :only (url to-str url-encode)]]
-    [org.clojars.smee
-     [map :only (map-values)]
-     [util :only (s2i)]])
-  (:require [fds2app.fds :as f]
-            [fds2app.views 
-             [common :refer (layout-with-links layout)]
-             [rest :refer (node2json root-node)]]))
+     [element :only (link-to unordered-list)]
+     [util :only (url url-encode)]]
+    [org.clojars.smee.map :only (map-values)])
+  (:require 
+    [fds2app.fds :as f]
+    [fds2app.views 
+     [common :refer (layout-with-links layout)]
+     [rest :refer (node2json root-node)]]))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ## federated data as json
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  Federated data as JSON
 
 (defpage "/fds.json" {:keys [id]}
   (let [node (root-node)] 
     (if id
       (node2json (f/find-by-id id node))
       (node2json node))))
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ## html page
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ### HTML page
 
 (defpartial map->table [m]
   [:table.table.table-striped.table-condensed
@@ -69,7 +66,7 @@
        [:h4 "Weiterführende Informationen"]
        (seqs->table ["Referenzart" "Knotenart" "Link"] links)])))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ## main page - documentation
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ### Main page - documentation
 (defpage "/" []
   (layout
     [:h3 "Zugriff auf föderierte Daten"]

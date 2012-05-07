@@ -5,6 +5,7 @@
          [response :only (json)]]
         [fds2app.views 
          [common :only (layout absolute-url)]]
+        [fds2app.serialize :only (fds->map)]
         [org.clojars.smee 
          [map :only (map-values)]
          [util :only (md5)]])
@@ -19,12 +20,12 @@
 (defn node2json 
   "Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids."
   [fds-node]
-  (json (rest/fds->map fds-node)))
+  (json (fds->map fds-node)))
 
 (defn nodes2json 
   "Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids."
   [& fds-nodes]
-  (json (map rest/fds->map fds-nodes)))
+  (json (map fds->map fds-nodes)))
 
 ;; ## REST data source management - register remote REST data sources 
 

@@ -3029,7 +3029,7 @@ net.brehaut.ClojureTools = (function (SH) {
   };
 })(SyntaxHighlighter);
 </script><title>fds2app -- Marginalia</title></head><body><table><tr><td class="docs"><div class="header"><h1 class="project-name">fds2app</h1><h2 class="project-version">1.0.0-SNAPSHOT</h2><br /><p>Federated data server (FDS) is a prototype for integrating heterogenous data sources.</p>
-</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.4.0</td></tr><tr><td class="dep-name">org.clojure/data.zip</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0</td></tr><tr><td class="dep-name">org.clojure/data.csv</td><td class="dotted"><hr /></td><td class="dep-version">0.1.2</td></tr><tr><td class="dep-name">org.clojars.smee/common</td><td class="dotted"><hr /></td><td class="dep-version">1.2.4</td></tr><tr><td class="dep-name">com.cemerick/url</td><td class="dotted"><hr /></td><td class="dep-version">0.0.5</td></tr><tr><td class="dep-name">clj-http</td><td class="dotted"><hr /></td><td class="dep-version">0.4.0</td></tr><tr><td class="dep-name">noir</td><td class="dotted"><hr /></td><td class="dep-version">1.3.0-beta2</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#fds2app.fds">fds2app.fds</a></li><li><a href="#fds2app.data.documents">fds2app.data.documents</a></li><li><a href="#fds2app.data.events">fds2app.data.events</a></li><li><a href="#fds2app.data.generated">fds2app.data.generated</a></li><li><a href="#fds2app.data.stammbaum">fds2app.data.stammbaum</a></li><li><a href="#fds2app.views.common">fds2app.views.common</a></li><li><a href="#fds2app.views.fds-explorer">fds2app.views.fds-explorer</a></li><li><a href="#fds2app.views.rest">fds2app.views.rest</a></li><li><a href="#fds2app.views.sample-datasource">fds2app.views.sample-datasource</a></li><li><a href="#fds2app.server">fds2app.server</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#fds2app.fds" name="fds2app.fds"><h1 class="project-name">fds2app.fds</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>The main assumptions are:</p>
+</div><div class="dependencies"><h3>dependencies</h3><table><tr><td class="dep-name">org.clojure/clojure</td><td class="dotted"><hr /></td><td class="dep-version">1.4.0</td></tr><tr><td class="dep-name">org.clojure/data.zip</td><td class="dotted"><hr /></td><td class="dep-version">0.1.0</td></tr><tr><td class="dep-name">org.clojure/data.csv</td><td class="dotted"><hr /></td><td class="dep-version">0.1.2</td></tr><tr><td class="dep-name">org.clojars.smee/common</td><td class="dotted"><hr /></td><td class="dep-version">1.2.5</td></tr><tr><td class="dep-name">com.cemerick/url</td><td class="dotted"><hr /></td><td class="dep-version">0.0.5</td></tr><tr><td class="dep-name">clj-http</td><td class="dotted"><hr /></td><td class="dep-version">0.4.0</td></tr><tr><td class="dep-name">noir</td><td class="dotted"><hr /></td><td class="dep-version">1.3.0-beta2</td></tr></table></div></td><td class="codes" style="text-align: center; vertical-align: middle;color: #666;padding-right:20px"><br /><br /><br />(this space intentionally left almost blank)</td></tr><tr><td class="docs"><div class="toc"><a name="toc"><h3>namespaces</h3></a><ul><li><a href="#fds2app.fds">fds2app.fds</a></li><li><a href="#fds2app.serialize">fds2app.serialize</a></li><li><a href="#fds2app.data.documents">fds2app.data.documents</a></li><li><a href="#fds2app.data.events">fds2app.data.events</a></li><li><a href="#fds2app.data.generated">fds2app.data.generated</a></li><li><a href="#fds2app.data.rest-proxy">fds2app.data.rest-proxy</a></li><li><a href="#fds2app.data.stammbaum">fds2app.data.stammbaum</a></li><li><a href="#fds2app.views.common">fds2app.views.common</a></li><li><a href="#fds2app.views.fds-explorer">fds2app.views.fds-explorer</a></li><li><a href="#fds2app.views.rest">fds2app.views.rest</a></li><li><a href="#fds2app.views.sample-datasource">fds2app.views.sample-datasource</a></li><li><a href="#fds2app.server">fds2app.server</a></li></ul></div></td><td class="codes">&nbsp;</td></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#fds2app.fds" name="fds2app.fds"><h1 class="project-name">fds2app.fds</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>The main assumptions are:</p>
 
 <ul>
 <li>There are several independent data sources</li>
@@ -3097,7 +3097,18 @@ Takes one optional parameter:
   (-&gt;&gt; fds-node distinct-fds-seq (filter pred)))</pre></td></tr><tr><td class="docs"><p>Find any node within the tree sequence spanned starting at the given node where id = key.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn find-by-id 
   [key fds-node]
-  (first (find-by #(= key (id %)) fds-node)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#fds2app.data.documents" name="fds2app.data.documents"><h1 class="project-name">fds2app.data.documents</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Example data source that contains informations about documents (i.e. poor man's document management system).
+  (first (find-by #(= key (id %)) fds-node)))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#fds2app.serialize" name="fds2app.serialize"><h1 class="project-name">fds2app.serialize</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Convert an instance of fds2app.Fds-Node to a serializable format.
+TODO think of a serialization format independent way to enable pluggable
+serialization formats.</p>
+</td><td class="codes"><pre class="brush: clojure">(ns fds2app.serialize
+  (:require [fds2app.fds :as f])
+  (:use [org.clojars.smee.map :only (map-values)]))</pre></td></tr><tr><td class="docs"><p>Convert an instance of fds2app.Fds-Node to a simple map.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn fds-&gt;map 
+  [fds-node]
+  {:id (f/id fds-node)
+   :type (f/type fds-node)
+   :properties (f/properties fds-node)
+   :relations (map-values (fn [nodes] (reduce #(update-in % [(f/type %2)] conj (f/id %2)) {} nodes)) (f/relations fds-node))})</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#fds2app.data.documents" name="fds2app.data.documents"><h1 class="project-name">fds2app.data.documents</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Example data source that contains informations about documents (i.e. poor man's document management system).
 Read document file name from local directory <em>sample-data/documents</em>, analyzes them and connects them
 to events (see namespace fds2app.data.events).</p>
 </td><td class="codes"><pre class="brush: clojure">(ns fds2app.data.documents
@@ -3199,7 +3210,82 @@ See <em>sample-data/events.csv</em> for sample events.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn by-id [^String id]
   (let [[_ n] (re-find #&quot;natural-number-([-]?\d+)&quot; id)]
     (when n
-      (new-number (s2i n)))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#fds2app.data.stammbaum" name="fds2app.data.stammbaum"><h1 class="project-name">fds2app.data.stammbaum</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
+      (new-number (s2i n)))))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#fds2app.data.rest-proxy" name="fds2app.data.rest-proxy"><h1 class="project-name">fds2app.data.rest-proxy</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>This namespace handles remote data sources (reachable via http). For an example please refer
+to the sample data source implementation <code>fds2app.views.sample-datasource</code>.</p>
+</td><td class="codes"><pre class="brush: clojure">(ns fds2app.data.rest-proxy
+  (:require
+    [cemerick.url :as u]
+    [cheshire.core :as json]
+    [fds2app.fds :as f]
+    [clj-http.client :as client])
+  (:use 
+    [org.clojars.smee.map :only (map-values)]
+    [fds2app.serialize :only (fds-&gt;map)]))</pre></td></tr><tr><td class="docs"><p>Metadata about remote http data sources</p>
+</td><td class="codes"><pre class="brush: clojure">(defrecord RemoteDataSource [name url])</pre></td></tr><tr><td class="docs"><p><code>data-sources</code> consists of a map of identifiers to instances of <code>RemoteDataSource</code>.</p>
+</td><td class="codes"><pre class="brush: clojure">(defonce data-sources (ref {}))</pre></td></tr><tr><td class="docs"><h2>Federated Data</h2>
+</td><td class="codes"><pre class="brush: clojure">(def ^:private separator &quot;&lt;&gt;&quot;)</pre></td></tr><tr><td class="docs"><p>Take a nested map of relation type to maps of node types to sequences of objects (ids, Fds-Nodes, ...). Transforms those
+objects using f and returns the relations.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- replace-related-nodes 
+  [f relations]
+  (map-values (fn [m] (map-values #(map f %) m)) relations))</pre></td></tr><tr><td class="docs"><p>Encode remote ids by prepending the name of the remote source, convert all json keys to keywords.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- encode-remote-ids 
+  [prefix {:strs [id] :as json-node}]
+  (let [node-map (map-values keyword identity json-node)
+        id-fix (partial str prefix separator)
+        node-map (update-in node-map [:id] id-fix)
+        rels (:relations node-map)
+        fixed-rels (replace-related-nodes id-fix rels)]
+    (assoc node-map :relations fixed-rels)))</pre></td></tr><tr><td class="docs"><p>Split remote id into vector of [id, id of data source (key in @data-sources), real id].</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- decode-remote-id 
+  [id]
+  (let [[source-id id] (.split id (str separator))]
+    [id source-id (@data-sources source-id)]))</pre></td></tr><tr><td class="docs"><p>Forward declaration of this function is necessary because it uses the type <code>RemoteNode</code> and vice versa.</p>
+</td><td class="codes"><pre class="brush: clojure">(declare find-by-remote-id)</pre></td></tr><tr><td class="docs"><p>RemoteNode is a Fds-Node that represents a remote information via REST. 
+It takes REST style maps as parameters. <code>relations</code> for example is assumed to contain ids that were generated using
+<code>encode-remote-ids</code>.</p>
+</td><td class="codes"><pre class="brush: clojure">(defrecord RemoteNode [id type properties relations]
+  f/Fds-Node
+  (id [_] id)
+  (type [_] type)
+  (properties [_] properties)
+  (relations [_] (map-values (fn [m] (map find-by-remote-id (apply concat (vals m)))) relations))
+  (relations [_ t] (map-values (fn [m] (map find-by-remote-id (apply concat (vals m)))) (select-keys relations [t]))))</pre></td></tr><tr><td class="docs"><p>Query remote REST datasource for a specific node by id. Splits the id into real remote id and name of the
+remote data source. Then it queries the remote source for the contents of the node.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn- find-by-remote-id 
+  [remote-id]
+  ;(println &quot;fetching remote node for id&quot; id)
+  (let [[id source-id {:keys [url]}] (decode-remote-id remote-id)
+        node-url (str (u/url url &quot;nodes&quot; id))
+        response (client/get node-url)
+        json-node (json/parse-string (:body response))]
+    ;(println &quot;got remote node&quot; (pr-str json-node))
+    (map-&gt;RemoteNode (encode-remote-ids source-id json-node))))</pre></td></tr><tr><td class="docs"><p>Create a function that queries a remote data source for relations to the given node.</p>
+</td><td class="codes"><pre class="brush: clojure">(defn remote-find-relations
+  [node &amp; [relation-type]]
+  (let [params {:node (json/generate-string (fds-&gt;map node))}
+        params (if relation-type 
+                 (assoc params :relation-type relation-type) 
+                 params)]
+    (reduce-kv 
+      (fn [relations source-id {:keys [url]}]
+        (let [rel-url (str (u/url url &quot;relations&quot;))
+              ;asking remote data source at url rel-url via REST
+              response (client/post rel-url 
+                                    {:form-params params 
+                                     :socket-timeout 1000
+                                     :conn-timeout 1000
+                                     :accept :json})
+              ;parse response
+              serialized-relations (json/parse-string (:body response))
+              ;replace ids with ids that contain the id of the datasource
+              ;so we know where to look later on
+              ids-fixed (map-values #(map (partial encode-remote-ids source-id) %) serialized-relations)]
+          (merge-with concat relations (map-values (partial map map-&gt;RemoteNode) ids-fixed))))
+      {}
+      @data-sources)))</pre></td></tr><tr><td class="docs"><p>evaluate this line to add our local data REST data source</p>
+</td><td class="codes"><pre class="brush: clojure">(comment
+  (dosync (alter data-sources assoc &quot;local&quot; (RemoteDataSource. &quot;localintegers&quot; &quot;http://localhost:8080/sample-data&quot;)))
+  )</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#fds2app.data.stammbaum" name="fds2app.data.stammbaum"><h1 class="project-name">fds2app.data.stammbaum</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns fds2app.data.stammbaum
   (:refer-clojure :exclude [descendants ancestors])
   (:require clojure.walk
@@ -3319,27 +3405,24 @@ See <em>sample-data/events.csv</em> for sample events.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns fds2app.views.fds-explorer
   (:use 
     [noir 
-     [core :only (defpage defpartial url-for)]
-     [options :only (resolve-url)]
-     [response :only (redirect json)]
+     [core :only (defpage defpartial)]
+     [response :only (json)]
      [session :only (flash-get flash-put!)]]
     [hiccup 
-     [core :only (html)]
-     [element :only (link-to javascript-tag unordered-list)]
-     [util :only (url to-str url-encode)]]
-    [org.clojars.smee
-     [map :only (map-values)]
-     [util :only (s2i)]])
-  (:require [fds2app.fds :as f]
-            [fds2app.views 
-             [common :refer (layout-with-links layout)]
-             [rest :refer (node2json root-node)]]))</pre></td></tr><tr><td class="docs"><h2>federated data as json</h2>
+     [element :only (link-to unordered-list)]
+     [util :only (url url-encode)]]
+    [org.clojars.smee.map :only (map-values)])
+  (:require 
+    [fds2app.fds :as f]
+    [fds2app.views 
+     [common :refer (layout-with-links layout)]
+     [rest :refer (node2json root-node)]]))</pre></td></tr><tr><td class="docs"><p> Federated data as JSON</p>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpage &quot;/fds.json&quot; {:keys [id]}
   (let [node (root-node)] 
     (if id
       (node2json (f/find-by-id id node))
-      (node2json node))))</pre></td></tr><tr><td class="docs"><h2>html page</h2>
+      (node2json node))))</pre></td></tr><tr><td class="docs"><h3>HTML page</h3>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpartial map-&gt;table [m]
   [:table.table.table-striped.table-condensed
@@ -3378,7 +3461,7 @@ See <em>sample-data/events.csv</em> for sample events.</p>
        [:h3 &quot;Inhalt&quot;]
        (map-&gt;table (map-values str (f/properties node)))
        [:h4 &quot;Weiterführende Informationen&quot;]
-       (seqs-&gt;table [&quot;Referenzart&quot; &quot;Knotenart&quot; &quot;Link&quot;] links)])))</pre></td></tr><tr><td class="docs"><h2>main page - documentation</h2>
+       (seqs-&gt;table [&quot;Referenzart&quot; &quot;Knotenart&quot; &quot;Link&quot;] links)])))</pre></td></tr><tr><td class="docs"><h3>Main page - documentation</h3>
 </td><td class="codes"><pre class="brush: clojure">(defpage &quot;/&quot; []
   (layout
     [:h3 &quot;Zugriff auf föderierte Daten&quot;]
@@ -3396,118 +3479,44 @@ See <em>sample-data/events.csv</em> for sample events.</p>
          [response :only (json)]]
         [fds2app.views 
          [common :only (layout absolute-url)]]
-        [org.clojars.smee.map :only (map-values)])
+        [fds2app.serialize :only (fds-&gt;map)]
+        [org.clojars.smee 
+         [map :only (map-values)]
+         [util :only (md5)]])
   (:require [fds2app.fds :as f]
             [fds2app.data
              [events :as ev]
              [stammbaum :as st]
-             [documents :as d]]
-            [cemerick.url :as u]
-            [clj-http.client :as client]
-            [cheshire.core :as json])
-  (:import [java.security NoSuchAlgorithmException MessageDigest]
-           java.math.BigInteger))</pre></td></tr><tr><td class="docs"><p>Serialize an instance of fds2app.Fds-Node as a map.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn fds-&gt;map 
-  [fds-node]
-  {:id (f/id fds-node)
-   :type (f/type fds-node)
-   :properties (f/properties fds-node)
-   :relations (map-values (fn [nodes] (reduce #(update-in % [(f/type %2)] conj (f/id %2)) {} nodes)) (f/relations fds-node))})</pre></td></tr><tr><td class="docs"><p>Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids.</p>
+             [documents :as d]
+             [rest-proxy :as rest]]
+            [cemerick.url :as u]))</pre></td></tr><tr><td class="docs"><p>Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn node2json 
   [fds-node]
   (json (fds-&gt;map fds-node)))</pre></td></tr><tr><td class="docs"><p>Render Fds-Node as JSON. The relations get serialized as a nested map of relation types to maps of node types to lists of node ids.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn nodes2json 
   [&amp; fds-nodes]
-  (json (map fds-&gt;map fds-nodes)))</pre></td></tr><tr><td class="docs"><p>Compute the hex MD5 sum of a byte array.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- md5
-  [#^bytes b]
-  (let [alg (doto (MessageDigest/getInstance &quot;MD5&quot;)
-              (.reset)
-              (.update b))]
-    (try
-      (.toString (new BigInteger 1 (.digest alg)) 16)
-      (catch NoSuchAlgorithmException e
-        (throw (new RuntimeException e))))))</pre></td></tr><tr><td class="docs"><h2>REST data source management - register remote REST data sources</h2>
-</td><td class="codes"><pre class="brush: clojure">(defrecord RemoteDataSource [name url])
-(defonce ^:private data-sources (ref {}))</pre></td></tr><tr><td class="docs">
+  (json (map fds-&gt;map fds-nodes)))</pre></td></tr><tr><td class="docs"><h2>REST data source management - register remote REST data sources</h2>
+</td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpage [:get &quot;/fds/data-sources&quot;] []
-  (json @data-sources))</pre></td></tr><tr><td class="docs">
+  (json @rest/data-sources))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpage [:delete &quot;/fds/data-sources/:id&quot;] {:keys [id]}
-  (dosync (alter data-sources dissoc id))
+  (dosync (alter rest/data-sources dissoc id))
   {:status 200})</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpage [:get &quot;/fds/data-sources/:id&quot;] {:keys [id]}
-  (json (@data-sources id)))</pre></td></tr><tr><td class="docs">
+  (json (@rest/data-sources id)))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpage [:post &quot;/fds/data-sources&quot;] {:keys [callback-url name]}
   (if (and (not-empty callback-url) (not-empty name)) 
     (let [id (md5 (.getBytes callback-url))]
-      (dosync (alter data-sources assoc id  (RemoteDataSource. name callback-url)))
+      (dosync (alter rest/data-sources assoc id  (rest/-&gt;RemoteDataSource name callback-url)))
       {:status 200
        :body (str &quot;/fds/data-sources/&quot; id)})
     {:status 400
-     :body &quot;missing parameter 'callback-url' and 'name'&quot;}))</pre></td></tr><tr><td class="docs"><h2>Federated Data</h2>
-</td><td class="codes"><pre class="brush: clojure">(def ^:private separator &quot;&lt;&gt;&quot;)</pre></td></tr><tr><td class="docs"><p>Take a nested map of relation type to maps of node types to sequences of objects (ids, Fds-Nodes, ...). Transforms those
-objects using f and returns the relations.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- replace-related-nodes 
-  [f relations]
-  (map-values (fn [m] (map-values #(map f %) m)) relations))</pre></td></tr><tr><td class="docs"><p>Encode remote ids by prepending the name of the remote source, convert all json keys to keywords.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- encode-remote-ids 
-  [prefix {:strs [id] :as json-node}]
-  (let [node-map (map-values keyword identity json-node)
-        id-fix (partial str prefix separator)
-        node-map (update-in node-map [:id] id-fix)
-        rels (:relations node-map)
-        fixed-rels (replace-related-nodes id-fix rels)]
-    (assoc node-map :relations fixed-rels)))</pre></td></tr><tr><td class="docs"><p>Split remote id into vector of [id, id of data source (key in @data-sources), real id].</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- decode-remote-id 
-  [id]
-  (let [[source-id id] (.split id (str separator))]
-    [id source-id (@data-sources source-id)]))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(declare find-by-remote-id)</pre></td></tr><tr><td class="docs"><p>RemoteNode is a Fds-Node that represents a remote information via REST. </p>
-</td><td class="codes"><pre class="brush: clojure">(defrecord RemoteNode [id type properties relations]
-  f/Fds-Node
-  (id [_] id)
-  (type [_] type)
-  (properties [_] properties)
-  (relations [_] (map-values (fn [m] (map find-by-remote-id (apply concat (vals m)))) relations))
-  (relations [_ t] (map-values (fn [m] (map find-by-remote-id (apply concat (vals m)))) (select-keys relations [t]))))</pre></td></tr><tr><td class="docs"><p>Query remote REST datasource for a specific node by id.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- find-by-remote-id 
-  [remote-id]
-  ;(println &quot;fetching remote node for id&quot; id)
-  (let [[id source-id {:keys [url]}] (decode-remote-id remote-id)
-        node-url (str (u/url url &quot;nodes&quot; id))
-        response (client/get node-url)
-        json-node (json/parse-string (:body response))]
-    ;(println &quot;got remote node&quot; (pr-str json-node))
-    (map-&gt;RemoteNode (encode-remote-ids source-id json-node))))</pre></td></tr><tr><td class="docs"><p>Create a function that queries a remote data source for relations to the given node.</p>
-</td><td class="codes"><pre class="brush: clojure">(defn- remote-find-relations
-  [node &amp; [relation-type]]
-  (let [params {:node (json/generate-string (fds-&gt;map node))}
-        params (if relation-type 
-                 (assoc params :relation-type relation-type) 
-                 params)]
-    (reduce-kv 
-      (fn [relations source-id {:keys [url]}]
-        (let [rel-url (str (u/url url &quot;relations&quot;))
-              ;asking remote data source at url rel-url via REST
-              response (client/post rel-url 
-                                    {:form-params params 
-                                     :socket-timeout 1000
-                                     :conn-timeout 1000
-                                     :accept :json})
-              ;parse response
-              serialized-relations (json/parse-string (:body response))
-              ;replace ids with ids that contain the id of the datasource
-              ;so we know where to look later on
-              ids-fixed (map-values #(map (partial encode-remote-ids source-id) %) serialized-relations)
-              ]
-        (merge-with concat relations (map-values (partial map map-&gt;RemoteNode) ids-fixed))))
-      {}
-      @data-sources)))</pre></td></tr><tr><td class="docs"><h2>internal root node</h2>
+     :body &quot;missing parameter 'callback-url' and 'name'&quot;}))</pre></td></tr><tr><td class="docs"><h2>internal root node</h2>
 </td><td class="codes"></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(def ^:private internal-root-node 
   (let [event-list (ev/read-events &quot;sample-data/events.csv&quot;)
         park (st/stammbaum-fds &quot;sample-data/komponenten-sea1.xml&quot;)]
-    (f/enhanced-tree event-list (st/component-finder park) d/join-documents remote-find-relations)))</pre></td></tr><tr><td class="docs"><p>Get root node of the contents of this federated data server.</p>
+    (f/enhanced-tree event-list (st/component-finder park) d/join-documents rest/remote-find-relations)))</pre></td></tr><tr><td class="docs"><p>Get root node of the contents of this federated data server.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn root-node 
   []
   internal-root-node)</pre></td></tr><tr><td class="docs"><p>Documentation page </p>
@@ -3518,10 +3527,10 @@ objects using f and returns the relations.</p>
      [:tr (for [d doc] [:td d])])]) </pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpage &quot;/fds/doc&quot; []
   (let [registration-docs
-        [[(str (absolute-url) &quot;/fds/data-sources&quot;) &quot;GET&quot; &quot;-&quot; &quot;JSON mit IDs und URLs aller bekannten Datenquellen&quot;]
-         [(str (absolute-url) &quot;/fds/data-sources&quot;) &quot;POST&quot; &quot;callback-url, name&quot; &quot;Füge eine neue Datenquelle hinzu. Liefert die URL fuer die neue Datenquelle.&quot;]
-         [(str (absolute-url) &quot;/fds/data-sources/ID&quot;) &quot;GET&quot; &quot;-&quot; &quot;Registrierte URL einer Datenquelle&quot;]
-         [(str (absolute-url) &quot;/fds/data-sources/ID&quot;) &quot;DELETE&quot; &quot;-&quot; &quot;Lösche URL einer Datenquelle&quot;]]
+        [[(str (u/url (absolute-url) &quot;/fds/data-sources&quot;)) &quot;GET&quot; &quot;-&quot; &quot;JSON mit IDs und URLs aller bekannten Datenquellen&quot;]
+         [(str (u/url (absolute-url) &quot;/fds/data-sources&quot;)) &quot;POST&quot; &quot;callback-url, name&quot; &quot;Füge eine neue Datenquelle hinzu. Liefert die URL fuer die neue Datenquelle.&quot;]
+         [(str (u/url (absolute-url) &quot;/fds/data-sources/ID&quot;)) &quot;GET&quot; &quot;-&quot; &quot;Registrierte URL einer Datenquelle&quot;]
+         [(str (u/url (absolute-url) &quot;/fds/data-sources/ID&quot;)) &quot;DELETE&quot; &quot;-&quot; &quot;Lösche URL einer Datenquelle&quot;]]
         data-source-docs
         [[&quot;.../nodes&quot; &quot;GET&quot; &quot;-&quot; &quot;Liste der Wurzelknoten dieser Datenquelle&quot;]
          [&quot;.../nodes/:id&quot; &quot;GET&quot; &quot;-&quot; &quot;\&quot;:id\&quot; wird durch eine ID eines Datenknotens ersetzt. Liefert den vollständigen Datenknoten zu dieser ID zurück.&quot;]
@@ -3542,32 +3551,25 @@ objects using f and returns the relations.</p>
        [:h4 &quot;Beispiel&quot;]
        &quot;siehe &quot; [:a {:href&quot;/sample-data&quot;} &quot;diese Datenquelle&quot;] &quot; für natürliche Zahlen&quot;
        [:h3 &quot;Registrierung von Datenquellen&quot;]
-       (rest-documentation registration-docs)])))</pre></td></tr><tr><td class="docs"><p>evaluate this line to add our local data REST data source</p>
-</td><td class="codes"><pre class="brush: clojure">(comment
-  (dosync (alter data-sources assoc &quot;local&quot; (RemoteDataSource. &quot;localintegers&quot; &quot;http://localhost:8080/sample-data&quot;)))
-  )</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#fds2app.views.sample-datasource" name="fds2app.views.sample-datasource"><h1 class="project-name">fds2app.views.sample-datasource</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Sample REST data source. Provides Fds-Nodes that count the number of properties of other Fds-Nodes.
+       (rest-documentation registration-docs)])))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#fds2app.views.sample-datasource" name="fds2app.views.sample-datasource"><h1 class="project-name">fds2app.views.sample-datasource</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs"><p>Sample REST data source. Provides Fds-Nodes that count the number of properties of other Fds-Nodes.
 Also they have two relations themselves: predecessor and successor.</p>
 </td><td class="codes"><pre class="brush: clojure">(ns  
      fds2app.views.sample-datasource
   (:use [noir
          [core :only (defpage)]
          [response :only (json)]]
-        [fds2app.views 
-         [common :only (layout)]
-         [rest :only (nodes2json node2json fds-&gt;map)]]
-        [org.clojars.smee.util :only (s2i)])
-  (:require [fds2app.fds :as f]
-            [fds2app.data.generated :as gen]
-            [clojure.java.io :as io]
-            [cheshire.core :as json]))</pre></td></tr><tr><td class="docs">
+        [fds2app.serialize :only (fds-&gt;map)])
+  (:require 
+    [fds2app.data.generated :as gen]
+    [cheshire.core :as json]))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpage &quot;/sample-data&quot; []
   &quot;Return some integer numbers. When asked for relations, returns the count of the node's properties.&quot;
   &quot;There are three sub-urls: nodes, nodes/:id and relations.&quot;)</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpage &quot;/sample-data/nodes&quot; []
-  (nodes2json (gen/new-number 99) (gen/new-number 0) (gen/new-number 5000)))</pre></td></tr><tr><td class="docs">
+  (json (map fds-&gt;map [(gen/new-number 99) (gen/new-number 0) (gen/new-number 5000)])))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpage &quot;/sample-data/nodes/:id&quot; {:keys [id]}
   (if-let [node (gen/by-id id)] 
-    (node2json node)
+    (json (fds-&gt;map node))
     {:status 400
      :body &quot;invalid id!&quot;}))</pre></td></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(defpage [:post &quot;/sample-data/relations&quot;] {:keys [node relation-type]}
