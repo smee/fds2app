@@ -41,7 +41,7 @@
 
 (defpage [:post "/fds/data-sources"] {:keys [callback-url name]}
   (if (and (not-empty callback-url) (not-empty name)) 
-    (let [id (md5 (.getBytes callback-url))]
+    (let [id (subs (md5 (.getBytes (str callback-url name))) 0 8)]
       (dosync (alter rest/data-sources assoc id  (rest/->RemoteDataSource name callback-url)))
       {:status 200
        :body (str "/fds/data-sources/" id)})
