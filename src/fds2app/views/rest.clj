@@ -76,9 +76,11 @@
          [(str (u/url (absolute-url) "/fds/data-sources/ID")) "GET" "-" "Registrierte URL einer Datenquelle"]
          [(str (u/url (absolute-url) "/fds/data-sources/ID")) "DELETE" "-" "Lösche URL einer Datenquelle"]]
         data-source-docs
-        [[".../nodes" "GET" "-" "Liste der Wurzelknoten dieser Datenquelle"]
+        [[".../nodes" "GET" "-" "Liste der Wurzelknoten dieser Datenquelle (bisher nicht verwendet)"]
          [".../nodes/:id" "GET" "-" "\":id\" wird durch eine ID eines Datenknotens ersetzt. Liefert den vollständigen Datenknoten zu dieser ID zurück."]
-         [".../relations" "POST" "node, relation-type (optional)" "Liefere mit dem übergebenen Datenknoten verknüpfte Informationen aus dieser Datenquelle zurück."]]]
+         [".../relations" "POST" "node, relation-type (optional)" 
+          [:p "Liefere alle mit dem übergebenen Datenknoten verknüpfte Informationen aus dieser Datenquelle zurück.
+Als Rückgabewert wird eine JSON-Map (Objekt) erwartet mit den Relationsarten als Schlüssel und als Werten wiederum Maps mit Knotentypen als Schlüsseln und Arrays mit IDs der Kindknoten. Siehe als Beispiel " [:a {:href"/fds.json"} "hier."]]]]]
     (layout
       [:div.span2]
       [:div.span10 

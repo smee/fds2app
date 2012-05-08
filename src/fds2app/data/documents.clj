@@ -8,11 +8,11 @@
             [clojure.string :refer (join)]))
 
 ;; Record for informations about document file names.
-(defrecord Documentation [power-station-id component-id mime date type]
+(defrecord Documentation [power-station-id component-id mime date type file]
   fds/Fds-Node
-  (id [_] (join "-" [power-station-id component-id mime date type]))
+  (id [_] (join "-" [power-station-id component-id date type mime]))
   (type [_] type)
-  (properties [this] (into {} this))
+  (properties [this] (assoc (into {} this) "Download" [:a {:href (str "/fds/document?id=" (fds/id this))} "Dokument"]))
   (relations [_] {})
   (relations  [this t] {}))
 
@@ -24,22 +24,22 @@ id of power station / id of component / type of document / date
   [file]
   (let [[ps-id comp-id doc-type rest] (seq (.split (.getName file) "__"))
         [date type] (.split rest "\\.")]
-    (->Documentation ps-id comp-id type date doc-type)))
+    (->Documentation ps-id comp-id type date doc-type (.getAbsolutePath file))))
 
 ;; Statically read all documents once.
-(def ^:private all-docs (map extract-metadata (find-files "sample-data/documents/")))
+(def all-docs (map extract-metadata (find-files "sample-data/documents/")))
 
 (defn join-documents 
   "Use this function as a parameter for `fds2app.fds/enhanced-tree`. It connects informations about documents
 to components."
   [node]
-  (let [docs (filter #(or (and 
-                            (= (-> % fds/properties :power-station-id)
-                               (-> node fds/properties :references :power-station-id))
-                            (= (-> % fds/properties :component-id)
-                               (-> node fds/properties :references :component-id)))
-                           (= (-> % fds/properties :component-id)
-                              (fds/id node)))
+  (let [docs (filter #(or 
+                        (and  (= (-> % fds/properties :power-station-id)
+                                 (-> node fds/properties :power-station-id))
+                              (= (-> % fds/properties :component-id)
+                                 (-> node fds/properties :component-id)))
+                        (= (-> % fds/properties :component-id)
+                           (fds/id node)))
                      all-docs)]
     (if (not-empty docs) 
       {:document docs}

@@ -1,8 +1,9 @@
 (ns fds2app.views.fds-explorer
   (:use 
+    [clojure.core.incubator :only (-?>)] 
     [noir 
      [core :only (defpage defpartial)]
-     [response :only (json)]
+     [response :only (json content-type)]
      [session :only (flash-get flash-put!)]]
     [hiccup 
      [element :only (link-to unordered-list)]
@@ -12,7 +13,9 @@
     [fds2app.fds :as f]
     [fds2app.views 
      [common :refer (layout-with-links layout)]
-     [rest :refer (node2json root-node)]]))
+     [rest :refer (node2json root-node)]]
+    [ring.util.mime-type :as mime]
+    [clojure.java.io :as io]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  Federated data as JSON
 
@@ -21,6 +24,29 @@
     (if id
       (node2json (f/find-by-id id node))
       (node2json node))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; host documents
+(def office-mime-types 
+  {"xlsx"   "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+   "xltx"   "application/vnd.openxmlformats-officedocument.spreadsheetml.template"
+   "potx"   "application/vnd.openxmlformats-officedocument.presentationml.template"
+   "ppsx"   "application/vnd.openxmlformats-officedocument.presentationml.slideshow"
+   "pptx"   "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+   "sldx"   "application/vnd.openxmlformats-officedocument.presentationml.slide"
+   "docx"   "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+   "dotx"   "application/vnd.openxmlformats-officedocument.wordprocessingml.template"
+   "xlam"   "application/vnd.ms-excel.addin.macroEnabled.12"
+   "xlsb"   "application/vnd.ms-excel.sheet.binary.macroEnabled.12})))"})
+
+(defpage "/fds/document" {:keys [id]}
+  (if-let [file (-> id (f/find-by-id (root-node)) f/properties :file (java.io.File.))]
+    (content-type (mime/ext-mime-type 
+                    (.getName file)
+                    office-mime-types)
+                  (io/input-stream file))
+    {:status 400
+     :body "Invalid id!"}))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ### HTML page
 
 (defpartial map->table [m]
@@ -62,7 +88,7 @@
       ;; main contents
       [:div.span10
        [:h3 "Inhalt"]
-       (map->table (map-values str (f/properties node)))
+       (map->table (f/properties node))
        [:h4 "Weiterführende Informationen"]
        (seqs->table ["Referenzart" "Knotenart" "Link"] links)])))
 

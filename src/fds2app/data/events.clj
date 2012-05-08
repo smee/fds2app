@@ -16,7 +16,9 @@
                       :date date, 
                       :description description, 
                       :source origin, 
-                      :references {:park-id park-id, :power-station-id power-station-id, :component-id component-id}
+                      :park-id park-id, 
+                      :power-station-id power-station-id, 
+                      :component-id component-id
                       :depth (count (fds/relations this))})
   (type       [_] (str "Ereignis " type))
   (id         [_] id))

@@ -64,5 +64,5 @@
   "Connect data about components to events."
   [park]
   (fn [node] 
-    (when-let [component (-> node fds/properties :references :component-id (fds/find-by-id park))] 
+    (when-let [component (-> node fds/properties :component-id (fds/find-by-id park))] 
       {:component [component]})))
