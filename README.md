@@ -10,6 +10,7 @@ This project contains:
 * a small webapplication that shows json representation of data nodes
 * a small webapplication that decodes EUMONIS file names (incl. query language)
 
+Please see the complete code documentation at *docs/uberdoc.html*.
 ## Usage
 
 To use the SWI-Prolog integration make sure to prepare your system:
@@ -18,8 +19,12 @@ To use the SWI-Prolog integration make sure to prepare your system:
 
 * Install [leiningen](https://github.com/technomancy/leiningen).
 * Run
-    `lein deps, run`
-* Then open a webbrowser and navigate to either [EUMONIS files](http://localhost:8080/sharepoint), [FDS root node](http://localhost:8080/fds) or the [visualization](http://localhost:8080/fds/visualize?max-depth=3).
+    `lein deps, run` (default port is 8080)
+* Or: Build standalone application with 
+    * `lein deps, uberjar`
+    * copy `target/fds2app-VERSION-standalone.jar` into the same folder as `sample-data`
+    * run `PORT=12345 java -jar fds2app-VERSION-standalone.jar`
+* Then open a webbrowser and navigate to either [FDS root node](http://localhost:8080/fds.html) or the [documentation](http://localhost:8080/).
 
 ## License
 

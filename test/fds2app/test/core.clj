@@ -8,9 +8,10 @@
     [org.clojars.smee.seq :only (bf-tree-seq)]
     [fds2app.data.events :only (read-events ->EreignisListe)]))
 
-(defrecord SimpleNode [id type properties relations]
+(defrecord SimpleNode [id type properties rels]
     Fds-Node
-    (relations   [_] relations)
+    (relations  [_] {:foo rels})
+    (relations  [this t] (select-keys (relations this) [t]))
     (type       [_] type)
     (properties [_] properties)
     (id         [_] id))
@@ -27,11 +28,11 @@
 (deftest inject-nodes
   (let [enhanced (enhanced-tree example 
                                 #(when (= "a" (id %)) 
-                                   [(SimpleNode. "injected" "foobar" {:value 55, :misc "baz"} [])])
+                                   {:foo [(SimpleNode. "injected" "foobar" {:value 55, :misc "baz"} [])]})
                                 #(when (= "foobar" (type %)) 
-                                   [(SimpleNode. "injected-injected" "another type" {:some :properties} [])]))]
-    (is (= [2 0 1 0] (map (comp count relations) (fds-seq example))))
-    (is (= [3 0 1 0 1 0] (map (comp count relations) (fds-seq enhanced))))))
+                                   {:foo [(SimpleNode. "injected-injected" "another type" {:some :properties} [])]}))]
+    (is (= [2 0 1 0] (map (comp count nodes relations) (fds-seq example))))
+    (is (= [3 0 1 1 0 0] (map (comp count nodes relations) (fds-seq enhanced))))))
 
 (deftest stammbaum-test
   (let [park (stammbaum-fds "sample-data/komponenten-sea1.xml")]
@@ -39,21 +40,23 @@
   
 (deftest events-test
   (let [events-root (read-events "sample-data/events.csv")]
-    (is (= 2 (count (relations events-root))))
-    (is (= 5 (count (fds-seq events-root))))))
+    (is (= 3 (count (nodes (relations events-root)))))
+    (is (= 7 (count (fds-seq events-root))))))
 
-(defn- component-finder [park]
-  (fn [node] 
-    (when-let [component (-> node properties :references :component-id (find-by-id park))] 
-      (vector component))))
+(defn- component-finder [park node & [type]]
+  (when-let [component (-> node properties :references :component-id (find-by-id park))]
+    (when (or (nil? type) (= type :component)) 
+      {:component [component]})))
+
 (deftest combine-events-and-stammbaum
   (let [event-list (read-events "sample-data/events.csv")
         park (stammbaum-fds "sample-data/komponenten-sea1.xml")
-        root-node (enhanced-tree event-list (component-finder park))]
-    (is (= 5 (-> event-list fds-seq count)))
+        root-node (enhanced-tree event-list (partial component-finder park))]
+    (def e root-node)
+    (is (= 7 (-> event-list fds-seq count)))
     (is (= 8 (-> park fds-seq count)))
-    (is (= 9 (-> root-node fds-seq count)))))
+    (is (= 13 (-> root-node fds-seq count)))))
 
 (deftest max-depth-traversal
-  (let [natural-numbers (fds-seq (fds2app.data.generated.NaturalNumber. 0) 50)]
-    (is (= 50 (count (take 100 natural-numbers))))))
+  (let [natural-numbers (fds-seq (fds2app.data.generated.NaturalNumber. 0) 4)]
+    (is (= 31 (count (take 100 natural-numbers))) "breadth first traversal of depth 4, 2 numbers as relations per node should result in 1+2^1+2^2+2^3+2^4=31 nodes all in all")))

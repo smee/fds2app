@@ -1,52 +1,97 @@
 (ns fds2app.views.fds-explorer
   (:use 
     [noir 
-     [core :only (defpage defpartial url-for)]
-     [options :only (resolve-url)]
-     [response :only (redirect json)]]
+     [core :only (defpage defpartial)]
+     [response :only (json)]
+     [session :only (flash-get flash-put!)]]
     [hiccup 
-     [core :only (html)]
-     [element :only (link-to javascript-tag)]
-     [util :only (url to-str url-encode)]]
-    [fds2app.dot :only (create-dot)]
-    [org.clojars.smee.util :only (s2i)])
-  (:require [fds2app.fds :as f]
-            [fds2app.data 
-             [events :as ev]
-             [stammbaum :as st]
-             [documents :as d]
-             generated]
-            ))
+     [element :only (link-to unordered-list)]
+     [util :only (url url-encode)]]
+    [org.clojars.smee.map :only (map-values)])
+  (:require 
+    [clojure.string :as string] 
+    [fds2app.fds :as f]
+    [fds2app.views 
+     [common :refer (layout-with-links layout)]
+     [rest :refer (node2json root-node)]]
+    [fds2app.data.rds-pp :as rds]
+    [hiccup.form :as form]))
 
-(defn- component-finder [park]
-  (fn [node] 
-    (when-let [component (-> node f/properties :references :component-id (f/find-by-id park))] 
-      (vector component))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  Federated data as JSON
 
-(def ^:private root 
-  (let [event-list (ev/read-events "sample-data/events.csv")
-        park (st/stammbaum-fds "sample-data/komponenten-sea1.xml")]
-    (f/enhanced-tree event-list (component-finder park) d/join-documents)))
+(defpage "/fds.json" {:keys [id]}
+  (let [node (root-node)] 
+    (if id
+      (node2json (f/find-by-id id node))
+      (node2json node))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ### HTML page
 
-(defn- serialize [fds-node]
-  (if fds-node
-    (json {:id (f/id fds-node)
-           :type (f/type fds-node)
-           :properties (f/properties fds-node)
-           :relations (map (juxt f/type #(to-str (url "/fds" {:id (f/id %)}))) (f/relations fds-node))})
-    {:status 400
-     :body "Unknown id!"}))
+(defpartial map->table [m]
+  [:table.table.table-striped.table-condensed
+   [:tr [:th "Schlüssel"] [:th "Wert"]] 
+   (for [[k v] m]
+     [:tr [:td k] [:td v]])])
 
-(defpage fds-explore "/fds" {:keys [id]}
-  (if id
-    (serialize (f/find-by-id id root))
-    (serialize root)))
+(defpartial seqs->table [headers seqs]
+  [:table.table.table-striped.table-condensed
+   [:tr (for [h headers] [:th h])] 
+   (for [vs seqs]
+     [:tr (for [v vs] 
+            [:td v])])])
 
+(defn- breadcrumb-links 
+  "Add link to current page to session, create vector of links to the last 8 visited pages."
+  [crnt-node]
+  (let [crumbs (or (flash-get :breadcrumbs) [])
+        next-link (link-to (str "/fds.html?id=" (url-encode (f/id crnt-node))) (f/type crnt-node))
+        next-crumbs (->> next-link (conj crumbs) (partition-by identity) (map first) (take-last 8) vec)]
+    (flash-put! :breadcrumbs next-crumbs)
+    next-crumbs))
 
-(defpage "/fds/visualize" {:keys [id max-depth]}
-  (let [max-depth (s2i max-depth 10)
-        root (if id (f/find-by-id id root) root)
-        ;root (fds2app.data.generated.NaturalNumber. 0)
-        graph (create-dot root max-depth)]
-    (html
-      [:img {:src (str "https://chart.googleapis.com/chart?cht=gv&chl=" (url-encode graph))}])))
+(defpage "/fds.html" {:keys [id]}
+  (let[root (root-node)
+       node (if (not-empty id) (f/find-by-id id root) root)
+       links (for [[k vs] (f/relations node), v vs]
+               [k (f/type v) (link-to (str "/fds.html?id=" (url-encode (f/id v))) "Link")])]
+    (layout-with-links
+      ;; top links
+      [0 [:a {:href "/"} "Home"] [:a {:href "mailto:sdienst@informatik.uni-leipzig.de"} "Kontakt"]]
+      ;; bread crumb trail
+      (breadcrumb-links node)
+      ;; left side bar
+      [:div.span2 
+       [:h4 "Federated data system"]
+       "Anzeige virtuell integrierter Daten bezüglich einer Energieerzeugungsanlage"]
+      ;; main contents
+      [:div.span10
+       [:h3 "Inhalt"]
+       (map->table (map-values str (f/properties node)))
+       [:h4 "Weiterführende Informationen"]
+       (seqs->table ["Referenzart" "Knotenart" "Link"] links)])))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ### Parser for RDS-PP
+(defpage "/rds-pp" {:keys [key]}
+  (if key 
+    (let [res (rds/query-rds key)]
+      (layout (-> res (string/replace "\n" "<br/>") (string/replace "\t" (apply str (repeat 4 "&nbsp;"))))))
+    (layout
+      [:h2 "Bedeutung von RDS-PP-Schlüsseln"]
+      (form/form-to [:GET "/rds-pp"]
+           (form/label "key" "Bitte geben Sie einen RDS-PP-Schlüssel ein: ") 
+           (form/text-field {:class "span8"} "key" "#PV01.L1SB0A =G001 MDL10 BT012 -WD001 QQ321 &MBB100/D00141")
+           (form/submit-button "Übersetzen")))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; ### Main page - documentation
+(defpage "/" []
+  (layout
+    [:h3 "Zugriff auf föderierte Daten"]
+    (unordered-list
+      [(link-to "/fds.json" "REST-Schnittstelle für föderierte Daten. Optionaler Parameter \"id\" für den Zugriff auf einen bestimmten Knoten")
+       (link-to "/fds.html" "Weboberfläche für föderierte Daten. Optionaler Parameter \"id\" für den Zugriff auf einen bestimmten Knoten")])
+    [:h3 "Registrierung von weiteren Datenquellen per REST"]
+    (unordered-list
+      [(link-to "/fds/doc" "Dokumentation REST für externe Datenquellen")
+       (link-to "/sample-data" "Beispiel für eine REST Datenquelle")])
+    [:h3 "Weitere Funktionen"]
+    (unordered-list
+      [(link-to "/rds-pp" "Parsen von RDS-PP-Bezeichnern")])))
