@@ -50,12 +50,17 @@
 
 
 
-;; ## internal root node 
-
+;; ## Internal root node. 
+;; The main root node is the event list. There are three functions providing relations:
+;; documents from `fds2app.data.documents`, component descriptions from `fds2app.data.stammbaum`
+;; and remotely fetched informations from `fds2app.data.rest-proxy`.
 (def ^:private internal-root-node 
   (let [event-list (ev/read-events "sample-data/events.csv")
         park (st/stammbaum-fds "sample-data/komponenten-sea1.xml")]
-    (f/enhanced-tree event-list (st/component-finder park) d/join-documents rest/remote-find-relations)))
+    (f/enhanced-tree event-list 
+                     (st/component-finder park)
+                     d/join-documents 
+                     rest/remote-find-relations)))
 
 (defn root-node 
   "Get root node of the contents of this federated data server."
