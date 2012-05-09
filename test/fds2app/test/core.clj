@@ -4,7 +4,7 @@
   (:use
     [clojure.test]
     fds2app.fds 
-    [fds2app.data.stammbaum :only (stammbaum-fds)]
+    [fds2app.data.stammbaum :only (stammbaum-fds component-finder)]
     [org.clojars.smee.seq :only (bf-tree-seq)]
     [fds2app.data.events :only (read-events ->EreignisListe)]))
 
@@ -43,15 +43,10 @@
     (is (= 3 (count (nodes (relations events-root)))))
     (is (= 7 (count (fds-seq events-root))))))
 
-(defn- component-finder [park node & [type]]
-  (when-let [component (-> node properties :references :component-id (find-by-id park))]
-    (when (or (nil? type) (= type :component)) 
-      {:component [component]})))
-
 (deftest combine-events-and-stammbaum
   (let [event-list (read-events "sample-data/events.csv")
         park (stammbaum-fds "sample-data/komponenten-sea1.xml")
-        root-node (enhanced-tree event-list (partial component-finder park))]
+        root-node (enhanced-tree event-list (component-finder park))]
     (def e root-node)
     (is (= 7 (-> event-list fds-seq count)))
     (is (= 8 (-> park fds-seq count)))
