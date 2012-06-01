@@ -5,7 +5,7 @@ Experimental implementation of a federated data server. Main idea is: Navigate l
 This project contains:
 
 * definition of data nodes, api for traversal/search and interlinking in fds2app.fds
-* sample data sources in fds2app.data.events and fds2app.data.stammbaum
+* sample data sources in fds2app.data.events and fds2app.data.stammbaum (incl. interpretation of RDS-PP expressions)
 * sample generated data source in fds2app.data.generated
 * a small webapplication that shows json representation of data nodes
 * a small webapplication that decodes EUMONIS file names (incl. query language)

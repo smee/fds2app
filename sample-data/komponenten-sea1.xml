@@ -14,6 +14,10 @@
 			<Komponente id="wr1" name="Teilsystem 1">
 				<Hersteller>OBI</Hersteller>
 				<Einbaudatum>2002-11-12T13:14:15</Einbaudatum>
+				<Komponente id="=G001 MDL10 BT012 -WD001" name="RDS-PP-Blackbox">
+				    <Hersteller>niemand</Hersteller>
+				    <Einbaudatum>2012-06-01T11:18:00</Einbaudatum>
+				</Komponente>
 			</Komponente>
 			<Komponente id="wr2" name="Teilsystem 2">
 				<Hersteller>OBI</Hersteller>

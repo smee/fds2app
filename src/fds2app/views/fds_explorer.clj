@@ -87,8 +87,11 @@
        "Anzeige virtuell integrierter Daten bezüglich einer Energieerzeugungsanlage"]
       ;; main contents
       [:div.span10
+       [:h3 "Metadaten"]
+       (map->table {"Id" (f/id node)
+                    "Knotentyp" (f/type node)}) 
        [:h3 "Inhalt"]
-       (map->table (f/properties node))
+       (map->table (map-values str (f/properties node)))
        [:h4 "Weiterführende Informationen"]
        (seqs->table ["Referenzart" "Knotenart" "Link"] links)])))
 

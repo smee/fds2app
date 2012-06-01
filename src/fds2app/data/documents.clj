@@ -12,7 +12,7 @@
   fds/Fds-Node
   (id [_] (join "-" [power-station-id component-id date type mime]))
   (type [_] type)
-  (properties [this] (assoc (into {} this) "Download" [:a {:href (str "/fds/document?id=" (fds/id this))} "Dokument"]))
+  (properties [this] (assoc (into {} this) "Download" (format "<a href=\"/fds/document?id=%s\">Dokument</a>" (fds/id this))))
   (relations [_] {})
   (relations  [this t] {}))
 

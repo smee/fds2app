@@ -14,7 +14,8 @@
              [events :as ev]
              [stammbaum :as st]
              [documents :as d]
-             [rest-proxy :as rest]]
+             [rest-proxy :as rest]
+             [rds-pp :as rds-pp]]
             [cemerick.url :as u]))
 
 (defn node2json 
@@ -60,7 +61,8 @@
     (f/enhanced-tree event-list 
                      (st/component-finder park)
                      d/join-documents 
-                     rest/remote-find-relations)))
+                     rest/remote-find-relations
+                     rds-pp/explain-rds-keys)))
 
 (defn root-node 
   "Get root node of the contents of this federated data server."

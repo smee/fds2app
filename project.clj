@@ -6,6 +6,7 @@
                  [org.clojars.smee/common "1.2.5"]
                  [com.cemerick/url "0.0.5"]
                  [clj-http "0.4.0"]
-                 [noir "1.3.0-beta2"]]
+                 [noir "1.3.0-beta2"]
+                 [rds_clj "1.0.0-SNAPSHOT"]]
   :main fds2app.server
   :ring {:handler fds2app.server/handler})
