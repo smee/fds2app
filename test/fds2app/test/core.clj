@@ -49,8 +49,8 @@
         root-node (enhanced-tree event-list (component-finder park))]
     (def e root-node)
     (is (= 7 (-> event-list fds-seq count)))
-    (is (= 8 (-> park fds-seq count)))
-    (is (= 13 (-> root-node fds-seq count)))))
+    (is (= 9 (-> park fds-seq count)))
+    (is (= 14 (-> root-node fds-seq count)))))
 
 (deftest max-depth-traversal
   (let [natural-numbers (fds-seq (fds2app.data.generated.NaturalNumber. 0) 4)]
