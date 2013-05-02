@@ -12,7 +12,7 @@
   fds/Fds-Node
   (id [_] (join "-" [power-station-id component-id date type mime]))
   (type [_] type)
-  (properties [this] (assoc (into {} this) "Download" (format "<a href=\"/fds/document?id=%s\">Dokument</a>" (fds/id this))))
+  (properties [this] (assoc (into {} this) "Download" (format "<a href=\"%s/fds/document?id=%s\">Dokument</a>" (fds2app.views.common/base-url) (fds/id this))))
   (relations [_] {})
   (relations  [this t] {}))
 

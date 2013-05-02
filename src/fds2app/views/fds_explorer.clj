@@ -78,7 +78,7 @@
                [k (f/type v) (link-to (str "/fds.html?id=" (url-encode (f/id v))) "Link")])]
     (layout-with-links
       ;; top links
-      [0 [:a {:href "/"} "Home"] [:a {:href "mailto:sdienst@informatik.uni-leipzig.de"} "Kontakt"]]
+      [0 [:a {:href (str (fds2app.views.common/base-url) "/")} "Home"] [:a {:href "mailto:sdienst@informatik.uni-leipzig.de"} "Kontakt"]]
       ;; bread crumb trail
       (breadcrumb-links node)
       ;; left side bar

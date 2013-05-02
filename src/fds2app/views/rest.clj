@@ -40,7 +40,7 @@
 (defpage [:get "/fds/data-sources/:id"] {:keys [id]}
   (json (@rest/data-sources id)))
 
-(defpage [:post "/fds/data-sources"] {:keys [callback-url name]}
+(defpage [:post "/fds/data-sources"] {:keys [callback-url name]} 
   (if (and (not-empty callback-url) (not-empty name)) 
     (let [id (subs (md5 (.getBytes (str callback-url name))) 0 8)]
       (dosync (alter rest/data-sources assoc id  (rest/->RemoteDataSource name callback-url)))
@@ -78,16 +78,16 @@
 
 (defpage "/fds/doc" []
   (let [registration-docs
-        [[(str (u/url (absolute-url) "/fds/data-sources")) "GET" "-" "JSON mit IDs und URLs aller bekannten Datenquellen"]
-         [(str (u/url (absolute-url) "/fds/data-sources")) "POST" "callback-url, name" "Füge eine neue Datenquelle hinzu. Liefert die URL fuer die neue Datenquelle."]
-         [(str (u/url (absolute-url) "/fds/data-sources/ID")) "GET" "-" "Registrierte URL einer Datenquelle"]
-         [(str (u/url (absolute-url) "/fds/data-sources/ID")) "DELETE" "-" "Lösche URL einer Datenquelle"]]
+        [[(str (u/url (absolute-url) (str (fds2app.views.common/base-url) "/fds/data-sources"))) "GET" "-" "JSON mit IDs und URLs aller bekannten Datenquellen"]
+         [(str (u/url (absolute-url) (str (fds2app.views.common/base-url) "/fds/data-sources"))) "POST" "callback-url, name" "Füge eine neue Datenquelle hinzu. Liefert die URL fuer die neue Datenquelle."]
+         [(str (u/url (absolute-url) (str (fds2app.views.common/base-url) "/fds/data-sources/ID"))) "GET" "-" "Registrierte URL einer Datenquelle"]
+         [(str (u/url (absolute-url) (str (fds2app.views.common/base-url) "/fds/data-sources/ID"))) "DELETE" "-" "Lösche URL einer Datenquelle"]]
         data-source-docs
         [[".../nodes" "GET" "-" "Liste der Wurzelknoten dieser Datenquelle (bisher nicht verwendet)"]
          [".../nodes/:id" "GET" "-" "\":id\" wird durch eine ID eines Datenknotens ersetzt. Liefert den vollständigen Datenknoten zu dieser ID zurück."]
          [".../relations" "POST" "node, relation-type (optional)" 
           [:p "Liefere alle mit dem übergebenen Datenknoten verknüpfte Informationen aus dieser Datenquelle zurück.
-Als Rückgabewert wird eine JSON-Map (Objekt) erwartet mit den Relationsarten als Schlüssel und als Werten wiederum Maps mit Knotentypen als Schlüsseln und Arrays mit IDs der Kindknoten. Siehe als Beispiel " [:a {:href"/fds.json"} "hier."]]]]]
+Als Rückgabewert wird eine JSON-Map (Objekt) erwartet mit den Relationsarten als Schlüssel und als Werten wiederum Maps mit Knotentypen als Schlüsseln und Arrays mit IDs der Kindknoten. Siehe als Beispiel " [:a {:href (str (fds2app.views.common/base-url) "/fds.json")} "hier."]]]]]
     (layout
       [:div.span2]
       [:div.span10 
@@ -102,7 +102,7 @@ Als Rückgabewert wird eine JSON-Map (Objekt) erwartet mit den Relationsarten al
        "Datenquellen müssen unter einer zu registrierenden Haupt-URL min. drei Sub-URLs bereitstellen:"
        (rest-documentation data-source-docs)
        [:h4 "Beispiel"]
-       "siehe " [:a {:href"/sample-data"} "diese Datenquelle"] " für natürliche Zahlen"
+       "siehe " [:a {:href (str (fds2app.views.common/base-url) "/sample-data")} "diese Datenquelle"] " für natürliche Zahlen"
        [:h3 "Registrierung von Datenquellen"]
        (rest-documentation registration-docs)])))
 

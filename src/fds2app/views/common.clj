@@ -6,6 +6,9 @@
          [element]
          [page :only (html5 include-css include-js)]]))
 
+(defn base-url []
+  (or (noir.options/get :base-url) ""))
+
 ;; Header.
 (defpartial eumonis-header []
   [:head 
@@ -15,14 +18,14 @@
                 "/css/customizations.css"
                 )
    ;(include-js "/js/bootstrap-modal.js")
-   [:link {:rel "shortcut icon" :href "/img/favicon.ico"}]])
+   [:link {:rel "shortcut icon" :href (str (fds2app.views.common/base-url) "/img/favicon.ico")}]])
 
 ;; Link bar
 (defpartial eumonis-topbar [[active-idx & links]]
   [:div.navbar
    [:div.navbar-inner
     [:div.container
-     [:a.brand {:href "/"} "EUMONIS - Federated Data System"]
+     [:a.brand {:href (str (fds2app.views.common/base-url) "/")} "EUMONIS - Federated Data System"]
      [:ul.nav
       (map-indexed #(if (= % active-idx) 
                       [:li.active %2] 

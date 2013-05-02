@@ -6,11 +6,14 @@
   (:use [org.clojars.smee.map :only (map-values)]))
 
 
+(defn foo [nodes] 
+  (reduce #(update-in % [(f/type %2)] conj (f/id %2)) {} nodes))
+
 (defn fds->map 
   "Convert an instance of fds2app.Fds-Node to a simple map."
   [fds-node]
   {:id (f/id fds-node)
    :type (f/type fds-node)
    :properties (f/properties fds-node)
-   :relations (map-values (fn [nodes] (reduce #(update-in % [(f/type %2)] conj (f/id %2)) {} nodes)) (f/relations fds-node))})
+   :relations (map-values foo (f/relations fds-node))})
 

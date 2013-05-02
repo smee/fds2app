@@ -19,7 +19,7 @@
 
 (def handler (server/gen-handler {:mode :prod
                   :ns 'fds2app
-                  :base-url "/"}))
+                  :base-url "/eumonis-fds"}))
 
 (comment
   (-main)
