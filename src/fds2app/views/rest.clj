@@ -15,7 +15,7 @@
              [stammbaum :as st]
              [documents :as d]
              [rest-proxy :as rest]
-             [rds-pp :as rds-pp]]
+             #_[rds-pp :as rds-pp]]
             [cemerick.url :as u]))
 
 (defn node2json 
@@ -50,7 +50,7 @@
      :body "missing parameter 'callback-url' and 'name'"}))
 
 
-
+(println (.getAbsolutePath (java.io.File. "."))) 
 ;; ## Internal root node. 
 ;; The main root node is the event list. There are three functions providing relations:
 ;; documents from `fds2app.data.documents`, component descriptions from `fds2app.data.stammbaum`
@@ -62,7 +62,7 @@
                      (st/component-finder park)
                      d/join-documents 
                      rest/remote-find-relations
-                     rds-pp/explain-rds-keys)))
+                     #_rds-pp/explain-rds-keys)))
 
 (defn root-node 
   "Get root node of the contents of this federated data server."

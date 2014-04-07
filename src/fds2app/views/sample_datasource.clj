@@ -1,11 +1,11 @@
 (ns ^{:doc "Sample REST data source. Provides Fds-Nodes that count the number of properties of other Fds-Nodes.
-Also they have two relations themselves: predecessor and successor."} 
+Also they have two relations themselves: predecessor and successor."}
      fds2app.views.sample-datasource
   (:use [noir
          [core :only (defpage)]
          [response :only (json)]]
         [fds2app.serialize :only (fds->map)])
-  (:require 
+  (:require
     [fds2app.data.generated :as gen]
     [cheshire.core :as json]))
 
@@ -19,7 +19,7 @@ Also they have two relations themselves: predecessor and successor."}
 
 
 (defpage "/sample-data/nodes/:id" {:keys [id]}
-  (if-let [node (gen/by-id id)] 
+  (if-let [node (gen/by-id id)]
     (json (fds->map node))
     {:status 400
      :body "invalid id!"}))
@@ -27,7 +27,7 @@ Also they have two relations themselves: predecessor and successor."}
 
 (defpage [:post "/sample-data/relations"] {:keys [node relation-type]}
   (let [{:strs [id type properties relations] :as node} (json/parse-string node)]
-    (def n node)
+    (println relation-type)
     (case relation-type
       ("some-integer" "" nil) (json {:some-integer [(fds->map (gen/new-number (count (keys properties))))]})
       (json []))))
