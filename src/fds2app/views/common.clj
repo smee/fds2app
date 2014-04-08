@@ -4,7 +4,8 @@
          [options :only (resolve-url)]]
         [hiccup core
          [element]
-         [page :only (html5 include-css include-js)]]))
+         [page :only (html5 include-css include-js)]])
+  (:require noir.request))
 
 (defn base-url []
   (or (noir.options/get :base-url) ""))
