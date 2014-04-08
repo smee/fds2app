@@ -8,6 +8,7 @@
                  [com.cemerick/url "0.0.5"]
                  [clj-http "0.4.0"]
                  [noir "1.3.0-beta10"]
-                 #_[rds_clj "1.0.0-SNAPSHOT"]]
+                 ;[rds_clj "1.0.0-SNAPSHOT"]
+				 ]
   :main fds2app.server
   :ring {:handler fds2app.server/handler})

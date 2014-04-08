@@ -15,7 +15,8 @@
              [stammbaum :as st]
              [documents :as d]
              [rest-proxy :as rest]
-             #_[rds-pp :as rds-pp]]
+             ;[rds-pp :as rds-pp]
+			 ]
             [cemerick.url :as u]))
 
 (defn node2json 
@@ -62,7 +63,8 @@
                      (st/component-finder park)
                      d/join-documents 
                      rest/remote-find-relations
-                     #_rds-pp/explain-rds-keys)))
+                     ;rds-pp/explain-rds-keys
+					 )))
 
 (defn root-node 
   "Get root node of the contents of this federated data server."
